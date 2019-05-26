@@ -320,6 +320,10 @@ impl TensorAttr {
     fn generic_name(&self) -> Result<String, String> {
         Ok(format!("{}_T", self.escaped_name()?))
     }
+
+    fn tensor_type(&self) -> Result<String, String> {
+        Ok(format!("{}_TensorType", self.escaped_name()?))   
+    }
 }
 
 impl AttrBootstrap for TensorAttr {
@@ -352,18 +356,28 @@ impl AttrBootstrap for TensorAttr {
     }
 
     fn builder_block(&self) -> Result<String, String> {
-        Ok(format!("Rc::new({})", self.escaped_name()?))
+        Ok(format!("Rc::new(Tensor::<{}>::from({}))", self.tensor_type()?, self.escaped_name()?))
     }
 
     fn update_env(&self, impl_: &mut OpImpl, lib: &mut OpLib) -> Result<(), String> {
         if !self.has_default() {
+            let tensor_type = self.tensor_type()?;
+
             impl_.builder.new_fn.generic(&self.generic_name()?);
-            impl_.builder.new_fn.bound(&self.generic_name()?, "AnyTensor");
+            impl_.builder.new_fn.bound(&format!("Tensor<{}>", &self.tensor_type()?),
+                                       &format!("From<{}>", self.generic_name()?));
             impl_.builder.new_fn.bound(&self.generic_name()?, "'static");
 
             impl_.builder.direct_new_fn.generic(&self.generic_name()?);
-            impl_.builder.direct_new_fn.bound(&self.generic_name()?, "AnyTensor");
+            impl_.builder.direct_new_fn.bound(&format!("Tensor<{}>", &self.tensor_type()?),
+                                              &format!("From<{}>", self.generic_name()?));
             impl_.builder.direct_new_fn.bound(&self.generic_name()?, "'static");
+
+            impl_.builder.new_fn.generic(&tensor_type);
+            impl_.builder.new_fn.bound(&tensor_type, "TensorType");
+
+            impl_.builder.direct_new_fn.generic(&tensor_type);
+            impl_.builder.direct_new_fn.bound(&tensor_type, "TensorType");
         }
         Ok(())
     }
@@ -371,8 +385,11 @@ impl AttrBootstrap for TensorAttr {
     fn builder_func(&self) -> Result<cg::Function, String> {
         let mut func = self.base_builder_func()?;
         func.generic(&self.generic_name()?)
-            .bound(&self.generic_name()?, "AnyTensor")
-            .bound(&self.generic_name()?, "'static");
+            .bound(&format!("Tensor<{}>", &self.tensor_type()?),
+                   &format!("From<{}>", self.generic_name()?))
+            .bound(&self.generic_name()?, "'static")
+            .generic(&self.tensor_type()?)
+            .bound(&self.tensor_type()?, "TensorType");
         Ok(func)
     }
 }
@@ -429,9 +446,15 @@ impl AddToImpl for TypeAttr {
             let bound = lib.contraint_trait(self.attr.allowed_types())?;
             impl_.bound(&ty, &bound);
         }
+
+        impl_.bound(&ty, "TensorType");
         impl_.bound(&ty, "'static");
         impl_.bound(&ty, "Clone");
         impl_.phantom(&ty);
+
+        let mut op_setup = cg::Block::new("");
+        op_setup.line(&format!("new_op.set_attr_type(\"{}\", {}::data_type())?;", &ty, &ty));
+        impl_.builder.add_op_description_setup(op_setup);
         Ok(())
     }
 }

@@ -40,6 +40,7 @@ impl OpLib {
         lib.scope.import("std::rc", "Rc");
         lib.scope.import("std", "f32");
         lib.scope.import("std", "f64");
+        lib.scope.import("std::convert", "From");
         lib.scope.import("std::marker", "PhantomData");
         lib.scope.import("super", "Result");
         lib
@@ -350,7 +351,8 @@ impl Builder {
 
         self.new_fn.ret("Self")
                    .vis("pub");
-        self.struct_.field("id_", "usize");
+        self.struct_.field("id_", "usize")
+                    .vis("pub");
         self.make_self.line("id_: new_id(),");
 
         self.struct_.derive("Clone");

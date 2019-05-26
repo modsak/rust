@@ -194,8 +194,6 @@ pub mod io;
 
 pub mod ops;
 
-mod test_ops;
-
 ////////////////////////
 
 c_enum!("Error values that can be returned.", TF_Code, Code {
@@ -1148,6 +1146,12 @@ impl<T: TensorType> Tensor<T> {
             inner: T::InnerType::new_inner(dims),
             dims: Vec::from(dims),
         }
+    }
+
+    /// Creates a new tensor with the values given
+    pub fn from_values(values: &[T]) -> Result<Self> {
+        let mut new_tensor = Self::new(&[values.len() as u64]);
+        new_tensor.with_values(values)
     }
 
     /// Sets (copies) the tensor values to the provided ones.

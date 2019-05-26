@@ -9,6 +9,7 @@ use super::SessionOptions;
 use super::Status;
 use super::Tensor;
 use super::TensorType;
+use super::Output;
 use super::Edge;
 use crate::tf;
 use libc::{c_char, c_int};
@@ -330,6 +331,11 @@ impl<'l> SessionRunArgs<'l> {
                                });
         self.output_tensors.push(ptr::null_mut());
         FetchToken { index: self.output_tensors.len() - 1 }
+    }
+
+    /// Wrapper around request_fetch for outputs
+    pub fn request_out<T: TensorType>(&mut self, output: &Output) -> FetchToken {
+        self.request_fetch(&output.operation, output.index)
     }
 
     /// Deprecated alias for request_fetch.

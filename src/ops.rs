@@ -9,6 +9,7 @@ use super::{Shape as OtherShape, new_id, TensorType, BFloat16, Tensor, AnyTensor
 use num_complex::Complex as OtherComplex;
 use std::rc::Rc;
 use std::{f32, f64};
+use std::convert::From;
 use std::marker::PhantomData;
 
 impl GraphOperation for GenerateBigQueryReaderPartitions {
@@ -56,7 +57,7 @@ impl GraphOperation for GenerateBigQueryReaderPartitions {
 }
 
 #[derive(Clone)]
-struct GenerateBigQueryReaderPartitions {
+pub struct GenerateBigQueryReaderPartitions {
     project_id: String,
     dataset_id: String,
     table_id: String,
@@ -167,7 +168,7 @@ impl GraphOperation for Skipgram {
 }
 
 #[derive(Clone)]
-struct Skipgram {
+pub struct Skipgram {
     filename: String,
     batch_size: i64,
     window_size: Option<i64>,
@@ -382,6 +383,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -394,7 +398,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyPowerSign<T>
+pub struct ApplyPowerSign<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -517,6 +521,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -529,7 +536,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyAddSign<T>
+pub struct ApplyAddSign<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -671,6 +678,12 @@ where T: TensorType,
             new_op.add_edge(&self.indices)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -683,7 +696,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyRMSProp<T, Tindices>
+pub struct SparseApplyRMSProp<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -829,6 +842,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -841,7 +857,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyCenteredRMSProp<T>
+pub struct ApplyCenteredRMSProp<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -971,6 +987,12 @@ where T: TensorType,
             new_op.add_edge(&self.momentum)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -989,7 +1011,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyMomentum<T, Tindices>
+pub struct SparseApplyMomentum<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -1141,6 +1163,12 @@ where T: TensorType,
             new_op.add_edge(&self.lr_power)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -1153,7 +1181,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyFtrlV2<T, Tindices>
+pub struct SparseApplyFtrlV2<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -1302,6 +1330,9 @@ where T: TensorType,
             new_op.add_edge(&self.lr_power)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -1314,7 +1345,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyFtrlV2<T>
+pub struct ApplyFtrlV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -1441,6 +1472,12 @@ where T: TensorType,
             new_op.add_edge(&self.indices)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -1459,7 +1496,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyAdagrad<T, Tindices>
+pub struct SparseApplyAdagrad<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -1602,6 +1639,12 @@ where T: TensorType,
             new_op.add_edge(&self.indices)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -1614,7 +1657,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyAdadelta<T, Tindices>
+pub struct SparseApplyAdadelta<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -1751,6 +1794,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -1763,7 +1809,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyAdadelta<T>
+pub struct ApplyAdadelta<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -1896,6 +1942,12 @@ where T: TensorType,
             new_op.add_edge(&self.lr_power)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -1908,7 +1960,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyFtrl<T, Tindices>
+pub struct SparseApplyFtrl<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -2052,7 +2104,7 @@ impl GraphOperation for UnicodeDecodeWithOffsets {
 }
 
 #[derive(Clone)]
-struct UnicodeDecodeWithOffsets {
+pub struct UnicodeDecodeWithOffsets {
     input: Edge<String>,
     input_encoding: String,
     errors: Option<String>,
@@ -2189,7 +2241,7 @@ impl GraphOperation for UnicodeDecode {
 }
 
 #[derive(Clone)]
-struct UnicodeDecode {
+pub struct UnicodeDecode {
     input: Edge<String>,
     input_encoding: String,
     errors: Option<String>,
@@ -2295,7 +2347,7 @@ impl GraphOperation for UnicodeScript {
 }
 
 #[derive(Clone)]
-struct UnicodeScript {
+pub struct UnicodeScript {
     input: Edge<i32>,
     op_name: Option<String>,
     id_: usize,
@@ -2367,6 +2419,9 @@ where T: TensorType,
             new_op.add_edge(&self.len)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.unit {
                 None => new_op.set_attr_value_proto("unit", &vec![18_u8, 4_u8, 66_u8, 89_u8, 84_u8, 69_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("unit", attr)})(&value)?,
@@ -2379,7 +2434,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Substr<T>
+pub struct Substr<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -2473,7 +2528,7 @@ impl GraphOperation for StringStrip {
 }
 
 #[derive(Clone)]
-struct StringStrip {
+pub struct StringStrip {
     input: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -2549,7 +2604,7 @@ impl GraphOperation for StringSplit {
 }
 
 #[derive(Clone)]
-struct StringSplit {
+pub struct StringSplit {
     input: Edge<String>,
     delimiter: Edge<String>,
     skip_empty: Option<bool>,
@@ -2652,7 +2707,7 @@ impl GraphOperation for StringToHashBucket {
 }
 
 #[derive(Clone)]
-struct StringToHashBucket {
+pub struct StringToHashBucket {
     string_tensor: Edge<String>,
     num_buckets: i64,
     op_name: Option<String>,
@@ -2728,7 +2783,7 @@ impl GraphOperation for StringLength {
 }
 
 #[derive(Clone)]
-struct StringLength {
+pub struct StringLength {
     input: Edge<String>,
     unit: Option<String>,
     op_name: Option<String>,
@@ -2809,7 +2864,7 @@ impl GraphOperation for StringToHashBucketStrong {
 }
 
 #[derive(Clone)]
-struct StringToHashBucketStrong {
+pub struct StringToHashBucketStrong {
     input: Edge<String>,
     num_buckets: i64,
     key: Vec<i64>,
@@ -2885,7 +2940,7 @@ impl GraphOperation for StringToHashBucketFast {
 }
 
 #[derive(Clone)]
-struct StringToHashBucketFast {
+pub struct StringToHashBucketFast {
     input: Edge<String>,
     num_buckets: i64,
     op_name: Option<String>,
@@ -2958,7 +3013,7 @@ impl GraphOperation for StaticRegexFullMatch {
 }
 
 #[derive(Clone)]
-struct StaticRegexFullMatch {
+pub struct StaticRegexFullMatch {
     input: Edge<String>,
     pattern: String,
     op_name: Option<String>,
@@ -3031,7 +3086,7 @@ impl GraphOperation for RegexFullMatch {
 }
 
 #[derive(Clone)]
-struct RegexFullMatch {
+pub struct RegexFullMatch {
     input: Edge<String>,
     pattern: Edge<String>,
     op_name: Option<String>,
@@ -3149,6 +3204,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.seed)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tseed", Tseed::data_type())?;
+        }
+        {
+            new_op.set_attr_type("output_dtype", output_dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -3156,7 +3220,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StatelessMultinomial<T, Tseed, output_dtype>
+pub struct StatelessMultinomial<T, Tseed, output_dtype>
 where T: TensorType,
       T: Clone,
       Tseed: TensorType,
@@ -3279,6 +3343,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.maxval)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tseed", Tseed::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -3286,7 +3359,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StatelessRandomUniformInt<T, Tseed, dtype>
+pub struct StatelessRandomUniformInt<T, Tseed, dtype>
 where T: TensorType,
       T: Clone,
       Tseed: TensorType,
@@ -3418,6 +3491,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.seed)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tseed", Tseed::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -3425,7 +3507,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StatelessTruncatedNormal<T, Tseed, dtype>
+pub struct StatelessTruncatedNormal<T, Tseed, dtype>
 where T: TensorType,
       T: Clone,
       Tseed: TensorType,
@@ -3539,6 +3621,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.seed)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tseed", Tseed::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -3546,7 +3637,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StatelessRandomNormal<T, Tseed, dtype>
+pub struct StatelessRandomNormal<T, Tseed, dtype>
 where T: TensorType,
       T: Clone,
       Tseed: TensorType,
@@ -3660,6 +3751,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -3672,7 +3769,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterNdSub<T, Tindices>
+pub struct ScatterNdSub<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -3785,6 +3882,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -3797,7 +3900,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterNdUpdate<T, Tindices>
+pub struct ScatterNdUpdate<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -3927,6 +4030,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -3939,7 +4048,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterMax<T, Tindices>
+pub struct ScatterMax<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -4053,6 +4162,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -4065,7 +4180,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterMin<T, Tindices>
+pub struct ScatterMin<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -4179,6 +4294,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -4191,7 +4312,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterMul<T, Tindices>
+pub struct ScatterMul<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -4298,6 +4419,9 @@ where T: TensorType,
             new_op.add_edge(&self.value)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -4310,7 +4434,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AssignSub<T>
+pub struct AssignSub<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -4399,6 +4523,9 @@ where T: TensorType,
             new_op.add_edge(&self.ref_)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("var_name", attr)})(&self.var_name)?
         }
         let op = new_op.finish()?;
@@ -4408,7 +4535,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DestroyTemporaryVariable<T>
+pub struct DestroyTemporaryVariable<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -4489,7 +4616,7 @@ impl GraphOperation for BatchIFFT3D {
 }
 
 #[derive(Clone)]
-struct BatchIFFT3D {
+pub struct BatchIFFT3D {
     input: Edge<OtherComplex<f32>>,
     op_name: Option<String>,
     id_: usize,
@@ -4556,7 +4683,7 @@ impl GraphOperation for BatchFFT3D {
 }
 
 #[derive(Clone)]
-struct BatchFFT3D {
+pub struct BatchFFT3D {
     input: Edge<OtherComplex<f32>>,
     op_name: Option<String>,
     id_: usize,
@@ -4623,7 +4750,7 @@ impl GraphOperation for BatchIFFT2D {
 }
 
 #[derive(Clone)]
-struct BatchIFFT2D {
+pub struct BatchIFFT2D {
     input: Edge<OtherComplex<f32>>,
     op_name: Option<String>,
     id_: usize,
@@ -4690,7 +4817,7 @@ impl GraphOperation for BatchFFT2D {
 }
 
 #[derive(Clone)]
-struct BatchFFT2D {
+pub struct BatchFFT2D {
     input: Edge<OtherComplex<f32>>,
     op_name: Option<String>,
     id_: usize,
@@ -4757,7 +4884,7 @@ impl GraphOperation for BatchIFFT {
 }
 
 #[derive(Clone)]
-struct BatchIFFT {
+pub struct BatchIFFT {
     input: Edge<OtherComplex<f32>>,
     op_name: Option<String>,
     id_: usize,
@@ -4827,7 +4954,7 @@ impl GraphOperation for IRFFT3D {
 }
 
 #[derive(Clone)]
-struct IRFFT3D {
+pub struct IRFFT3D {
     input: Edge<OtherComplex<f32>>,
     fft_length: Edge<i32>,
     op_name: Option<String>,
@@ -4900,7 +5027,7 @@ impl GraphOperation for IRFFT2D {
 }
 
 #[derive(Clone)]
-struct IRFFT2D {
+pub struct IRFFT2D {
     input: Edge<OtherComplex<f32>>,
     fft_length: Edge<i32>,
     op_name: Option<String>,
@@ -4973,7 +5100,7 @@ impl GraphOperation for RFFT2D {
 }
 
 #[derive(Clone)]
-struct RFFT2D {
+pub struct RFFT2D {
     input: Edge<f32>,
     fft_length: Edge<i32>,
     op_name: Option<String>,
@@ -5046,7 +5173,7 @@ impl GraphOperation for RFFT {
 }
 
 #[derive(Clone)]
-struct RFFT {
+pub struct RFFT {
     input: Edge<f32>,
     fft_length: Edge<i32>,
     op_name: Option<String>,
@@ -5123,6 +5250,9 @@ where Tcomplex: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("Tcomplex", Tcomplex::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5130,7 +5260,7 @@ where Tcomplex: TensorType,
 }
 
 #[derive(Clone)]
-struct IFFT2D<Tcomplex>
+pub struct IFFT2D<Tcomplex>
 where Tcomplex: TensorType,
       Tcomplex: Clone,
       Tcomplex: con_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -5208,6 +5338,9 @@ where Tcomplex: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("Tcomplex", Tcomplex::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5215,7 +5348,7 @@ where Tcomplex: TensorType,
 }
 
 #[derive(Clone)]
-struct FFT2D<Tcomplex>
+pub struct FFT2D<Tcomplex>
 where Tcomplex: TensorType,
       Tcomplex: Clone,
       Tcomplex: con_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -5293,6 +5426,9 @@ where Tcomplex: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("Tcomplex", Tcomplex::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5300,7 +5436,7 @@ where Tcomplex: TensorType,
 }
 
 #[derive(Clone)]
-struct IFFT<Tcomplex>
+pub struct IFFT<Tcomplex>
 where Tcomplex: TensorType,
       Tcomplex: Clone,
       Tcomplex: con_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -5386,6 +5522,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.default_value)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5393,7 +5532,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseFillEmptyRows<T>
+pub struct SparseFillEmptyRows<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -5525,6 +5664,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.b_shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5532,7 +5674,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSparseMinimum<T>
+pub struct SparseSparseMinimum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -5652,6 +5794,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.sp_shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5659,7 +5804,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSoftmax<T>
+pub struct SparseSoftmax<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -5752,6 +5897,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dense)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5759,7 +5907,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseDenseCwiseAdd<T>
+pub struct SparseDenseCwiseAdd<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -5859,6 +6007,9 @@ where T: TensorType,
             new_op.add_edge(&self.momentum)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -5877,7 +6028,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyMomentum<T>
+pub struct ApplyMomentum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -5992,6 +6143,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dense)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -5999,7 +6153,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseDenseCwiseDiv<T>
+pub struct SparseDenseCwiseDiv<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -6095,6 +6249,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dense)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6102,7 +6259,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseDenseCwiseMul<T>
+pub struct SparseDenseCwiseMul<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -6204,6 +6361,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6211,7 +6371,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseReduceSumSparse<T>
+pub struct SparseReduceSumSparse<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -6343,6 +6503,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6350,7 +6513,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseReduceSum<T>
+pub struct SparseReduceSum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -6460,6 +6623,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6467,7 +6633,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseReduceMaxSparse<T>
+pub struct SparseReduceMaxSparse<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -6597,6 +6763,12 @@ where Tindices: TensorType,
         {
             new_op.add_edge(&self.b)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6604,7 +6776,7 @@ where Tindices: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseTensorDenseAdd<Tindices, T>
+pub struct SparseTensorDenseAdd<Tindices, T>
 where Tindices: TensorType,
       Tindices: Clone,
       T: TensorType,
@@ -6707,6 +6879,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input_shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6714,7 +6889,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseReorder<T>
+pub struct SparseReorder<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -6817,6 +6992,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.output_indices)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6824,7 +7002,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSliceGrad<T>
+pub struct SparseSliceGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -6922,6 +7100,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("num_split", *attr)})(&self.num_split)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -6929,7 +7110,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSplit<T>
+pub struct SparseSplit<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -7044,7 +7225,7 @@ impl GraphOperation for IRFFT {
 }
 
 #[derive(Clone)]
-struct IRFFT {
+pub struct IRFFT {
     input: Edge<OtherComplex<f32>>,
     fft_length: Edge<i32>,
     op_name: Option<String>,
@@ -7123,6 +7304,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -7130,7 +7314,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseConcat<T>
+pub struct SparseConcat<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -7258,6 +7442,12 @@ where Tindices: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("validate_indices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -7265,7 +7455,7 @@ where Tindices: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseToDense<Tindices, T>
+pub struct SparseToDense<Tindices, T>
 where Tindices: TensorType,
       Tindices: Clone,
       T: TensorType,
@@ -7368,6 +7558,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.serialized_sparse)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -7375,7 +7568,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct DeserializeManySparse<dtype>
+pub struct DeserializeManySparse<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -7482,6 +7675,12 @@ where Tserialized: TensorType,
         {
             new_op.add_edge(&self.serialized_sparse)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tserialized", Tserialized::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -7489,7 +7688,7 @@ where Tserialized: TensorType,
 }
 
 #[derive(Clone)]
-struct DeserializeSparse<Tserialized, dtype>
+pub struct DeserializeSparse<Tserialized, dtype>
 where Tserialized: TensorType,
       Tserialized: Clone,
       dtype: TensorType,
@@ -7607,6 +7806,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.sparse_shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -7614,7 +7819,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SerializeManySparse<T, out_type>
+pub struct SerializeManySparse<T, out_type>
 where T: TensorType,
       T: Clone,
       out_type: TensorType,
@@ -7720,6 +7925,12 @@ where Tindices: TensorType,
             new_op.add_edge(&self.b)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.adjoint_a {
                 None => new_op.set_attr_value_proto("adjoint_a", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adjoint_a", *attr)})(&value)?,
@@ -7738,7 +7949,7 @@ where Tindices: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseTensorDenseMatMul<Tindices, T>
+pub struct SparseTensorDenseMatMul<Tindices, T>
 where Tindices: TensorType,
       Tindices: Clone,
       T: TensorType,
@@ -7872,6 +8083,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.thresh)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Treal", Treal::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -7879,7 +8096,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseAdd<T, Treal>
+pub struct SparseAdd<T, Treal>
 where T: TensorType,
       T: Clone,
       Treal: TensorType,
@@ -8017,6 +8234,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.sum_indices)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -8024,7 +8244,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseAddGrad<T>
+pub struct SparseAddGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -8171,6 +8391,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("validate_indices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -8178,7 +8401,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseToSparseSetOperation<T>
+pub struct SparseToSparseSetOperation<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_INT64_or_DT_UINT16,
@@ -8301,6 +8524,9 @@ where tensor_type: TensorType,
         };
         let mut new_op = graph.new_operation("_HostRecv", &op_name)?;
         {
+            new_op.set_attr_type("tensor_type", tensor_type::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("tensor_name", attr)})(&self.tensor_name)?
         }
         {
@@ -8325,7 +8551,7 @@ where tensor_type: TensorType,
 }
 
 #[derive(Clone)]
-struct _HostRecv<tensor_type>
+pub struct _HostRecv<tensor_type>
 where tensor_type: TensorType,
       tensor_type: 'static,
       tensor_type: Clone,
@@ -8418,6 +8644,9 @@ where T: TensorType,
             new_op.add_edge(&self.tensor)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("tensor_name", attr)})(&self.tensor_name)?
         }
         {
@@ -8442,7 +8671,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _HostSend<T>
+pub struct _HostSend<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -8533,6 +8762,9 @@ where T: TensorType,
             new_op.add_edge(&self.split)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("sa_name", attr)})(&self.sa_name)?
         }
         {
@@ -8551,7 +8783,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _ScopedAllocatorSplit<T>
+pub struct _ScopedAllocatorSplit<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -8648,6 +8880,9 @@ where T: TensorType,
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.reshape {
                 None => new_op.set_attr_value_proto("reshape", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("reshape", *attr)})(&value)?,
@@ -8669,7 +8904,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _ScopedAllocatorConcat<T>
+pub struct _ScopedAllocatorConcat<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -8771,6 +9006,9 @@ where T: TensorType,
             new_op.add_edge(&self.value)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.validate_shape {
                 None => new_op.set_attr_value_proto("validate_shape", &vec![40_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("validate_shape", *attr)})(&value)?,
@@ -8789,7 +9027,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Assign<T>
+pub struct Assign<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -8895,6 +9133,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -8902,7 +9143,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomShuffle<T>
+pub struct RandomShuffle<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -9010,6 +9251,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -9017,7 +9264,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TruncatedNormal<T, dtype>
+pub struct TruncatedNormal<T, dtype>
 where T: TensorType,
       T: Clone,
       dtype: TensorType,
@@ -9138,6 +9385,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -9145,7 +9398,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomStandardNormal<T, dtype>
+pub struct RandomStandardNormal<T, dtype>
 where T: TensorType,
       T: Clone,
       dtype: TensorType,
@@ -9266,6 +9519,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -9273,7 +9532,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomUniform<T, dtype>
+pub struct RandomUniform<T, dtype>
 where T: TensorType,
       T: Clone,
       dtype: TensorType,
@@ -9383,6 +9642,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("RAGGED_RANK", *attr)})(&self.RAGGED_RANK)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -9390,7 +9652,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RaggedTensorToSparse<T>
+pub struct RaggedTensorToSparse<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -9504,6 +9766,12 @@ where Tvalues: TensorType,
             new_op.add_edge(&self.indices)?
         }
         {
+            new_op.set_attr_type("Tvalues", Tvalues::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("PARAMS_RAGGED_RANK", *attr)})(&self.PARAMS_RAGGED_RANK)?
         }
         {
@@ -9516,7 +9784,7 @@ where Tvalues: TensorType,
 }
 
 #[derive(Clone)]
-struct RaggedGather<Tvalues, Tindices>
+pub struct RaggedGather<Tvalues, Tindices>
 where Tvalues: TensorType,
       Tvalues: Clone,
       Tindices: TensorType,
@@ -9642,6 +9910,9 @@ where out_type: TensorType,
         {
             new_op.add_edge(&self.string_tensor)?
         }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -9649,7 +9920,7 @@ where out_type: TensorType,
 }
 
 #[derive(Clone)]
-struct StringToNumber<out_type>
+pub struct StringToNumber<out_type>
 where out_type: TensorType,
       out_type: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64,
       out_type: 'static,
@@ -9729,7 +10000,7 @@ impl GraphOperation for DecodeJSONExample {
 }
 
 #[derive(Clone)]
-struct DecodeJSONExample {
+pub struct DecodeJSONExample {
     json_examples: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -9822,6 +10093,9 @@ where out_type: TensorType,
             new_op.add_edge(&self.bytes)?
         }
         {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
+        {
             match self.little_endian {
                 None => new_op.set_attr_value_proto("little_endian", &vec![40_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("little_endian", *attr)})(&value)?,
@@ -9834,7 +10108,7 @@ where out_type: TensorType,
 }
 
 #[derive(Clone)]
-struct DecodeRaw<out_type>
+pub struct DecodeRaw<out_type>
 where out_type: TensorType,
       out_type: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_HALF,
       out_type: 'static,
@@ -9985,6 +10259,12 @@ where Tinput: TensorType,
             new_op.add_edge(&self.gamma_max)?
         }
         {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
+        {
             (|attr: &f32| {new_op.set_attr_float("variance_epsilon", *attr)})(&self.variance_epsilon)?
         }
         {
@@ -9997,7 +10277,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedBatchNormWithGlobalNormalization<Tinput, out_type>
+pub struct QuantizedBatchNormWithGlobalNormalization<Tinput, out_type>
 where Tinput: TensorType,
       Tinput: Clone,
       out_type: TensorType,
@@ -10166,6 +10446,12 @@ where Tinput: TensorType,
         {
             new_op.add_edge(&self.max_features)?
         }
+        {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -10173,7 +10459,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedRelu6<Tinput, out_type>
+pub struct QuantizedRelu6<Tinput, out_type>
 where Tinput: TensorType,
       Tinput: Clone,
       out_type: TensorType,
@@ -10300,6 +10586,12 @@ where Tinput: TensorType,
         {
             new_op.add_edge(&self.max_features)?
         }
+        {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -10307,7 +10599,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedRelu<Tinput, out_type>
+pub struct QuantizedRelu<Tinput, out_type>
 where Tinput: TensorType,
       Tinput: Clone,
       out_type: TensorType,
@@ -10434,6 +10726,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -10446,7 +10744,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterUpdate<T, Tindices>
+pub struct ScatterUpdate<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -10554,6 +10852,9 @@ where T: TensorType,
             new_op.add_edge(&self.max_input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("ksize", attrs)})(&self.ksize)?
         }
         {
@@ -10569,7 +10870,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedMaxPool<T>
+pub struct QuantizedMaxPool<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
@@ -10708,6 +11009,15 @@ where Tinput: TensorType,
             new_op.add_edge(&self.max_filter)?
         }
         {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tfilter", Tfilter::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -10726,7 +11036,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedConv2D<Tinput, Tfilter, out_type>
+pub struct QuantizedConv2D<Tinput, Tfilter, out_type>
 where Tinput: TensorType,
       Tinput: Clone,
       Tfilter: TensorType,
@@ -10900,6 +11210,15 @@ where T1: TensorType,
         {
             new_op.add_edge(&self.max_bias)?
         }
+        {
+            new_op.set_attr_type("T1", T1::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T2", T2::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -10907,7 +11226,7 @@ where T1: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedBiasAdd<T1, T2, out_type>
+pub struct QuantizedBiasAdd<T1, T2, out_type>
 where T1: TensorType,
       T1: Clone,
       T2: TensorType,
@@ -11051,6 +11370,9 @@ where T: TensorType,
             new_op.add_edge(&self.max_input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("ksize", attrs)})(&self.ksize)?
         }
         {
@@ -11066,7 +11388,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedAvgPool<T>
+pub struct QuantizedAvgPool<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
@@ -11196,6 +11518,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("overlapping", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -11203,7 +11528,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FractionalAvgPoolGrad<T>
+pub struct FractionalAvgPoolGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64,
@@ -11307,6 +11632,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("sorted", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -11314,7 +11642,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TopKV2<T>
+pub struct TopKV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -11428,6 +11756,9 @@ where T: TensorType,
             new_op.add_edge(&self.delta)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -11440,7 +11771,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyProximalGradientDescent<T>
+pub struct ApplyProximalGradientDescent<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -11547,6 +11878,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("sorted", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -11554,7 +11888,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TopK<T>
+pub struct TopK<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -11661,6 +11995,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.k)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -11668,7 +12005,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct InTopKV2<T>
+pub struct InTopKV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -11758,6 +12095,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("k", *attr)})(&self.k)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -11765,7 +12105,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct InTopK<T>
+pub struct InTopK<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -11856,6 +12196,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.labels)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tlabels", Tlabels::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -11863,7 +12209,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSoftmaxCrossEntropyWithLogits<T, Tlabels>
+pub struct SparseSoftmaxCrossEntropyWithLogits<T, Tlabels>
 where T: TensorType,
       T: Clone,
       Tlabels: TensorType,
@@ -11970,6 +12316,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.labels)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -11977,7 +12326,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SoftmaxCrossEntropyWithLogits<T>
+pub struct SoftmaxCrossEntropyWithLogits<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12070,6 +12419,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.logits)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12077,7 +12429,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Softmax<T>
+pub struct Softmax<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12158,6 +12510,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12165,7 +12520,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SoftsignGrad<T>
+pub struct SoftsignGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12258,6 +12613,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("validate_indices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12265,7 +12623,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SetSize<T>
+pub struct SetSize<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_INT64_or_DT_UINT16,
@@ -12357,6 +12715,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12364,7 +12725,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Selu<T>
+pub struct Selu<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12456,7 +12817,7 @@ impl GraphOperation for StaticRegexReplace {
 }
 
 #[derive(Clone)]
-struct StaticRegexReplace {
+pub struct StaticRegexReplace {
     input: Edge<String>,
     pattern: String,
     rewrite: String,
@@ -12538,6 +12899,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.outputs)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12545,7 +12909,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct EluGrad<T>
+pub struct EluGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12626,6 +12990,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12633,7 +13000,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Elu<T>
+pub struct Elu<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12720,6 +13087,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("alpha", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12727,7 +13097,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LeakyReluGrad<T>
+pub struct LeakyReluGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12822,6 +13192,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("alpha", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12829,7 +13202,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LeakyRelu<T>
+pub struct LeakyRelu<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -12918,6 +13291,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -12925,7 +13301,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Relu6Grad<T>
+pub struct Relu6Grad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -13006,6 +13382,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -13013,7 +13392,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Relu6<T>
+pub struct Relu6<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -13094,6 +13473,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -13101,7 +13483,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ReluGrad<T>
+pub struct ReluGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -13218,6 +13600,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -13225,7 +13610,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Relu<T>
+pub struct Relu<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_QINT8_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -13310,6 +13695,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -13325,7 +13713,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Dilation2DBackpropInput<T>
+pub struct Dilation2DBackpropInput<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -13437,6 +13825,12 @@ where T: TensorType,
         {
             (|attr| {new_op.set_attr_string("padding", attr)})(&self.padding)?
         }
+        {
+            new_op.set_attr_type("Targmax", Targmax::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -13444,7 +13838,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolGradGradWithArgmax<T, Targmax>
+pub struct MaxPoolGradGradWithArgmax<T, Targmax>
 where T: TensorType,
       T: Clone,
       Targmax: TensorType,
@@ -13567,6 +13961,12 @@ where T: TensorType,
         {
             (|attr| {new_op.set_attr_string("padding", attr)})(&self.padding)?
         }
+        {
+            new_op.set_attr_type("Targmax", Targmax::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -13574,7 +13974,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolGradWithArgmax<T, Targmax>
+pub struct MaxPoolGradWithArgmax<T, Targmax>
 where T: TensorType,
       T: Clone,
       Targmax: TensorType,
@@ -13677,6 +14077,9 @@ where out_type: TensorType,
         {
             new_op.add_edge(&self.serialized)?
         }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -13684,7 +14087,7 @@ where out_type: TensorType,
 }
 
 #[derive(Clone)]
-struct ParseTensor<out_type>
+pub struct ParseTensor<out_type>
 where out_type: TensorType,
       out_type: 'static,
       out_type: Clone,
@@ -13771,7 +14174,13 @@ where T: TensorType,
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
+            new_op.set_attr_type("Targmax", Targmax::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("padding", attr)})(&self.padding)?
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
         }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
@@ -13780,7 +14189,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolWithArgmax<T, Targmax>
+pub struct MaxPoolWithArgmax<T, Targmax>
 where T: TensorType,
       T: Clone,
       Targmax: TensorType,
@@ -13911,6 +14320,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -13918,7 +14330,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolGradGradV2<T>
+pub struct MaxPoolGradGradV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -14040,6 +14452,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -14047,7 +14462,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolGrad<T>
+pub struct MaxPoolGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -14179,6 +14594,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("ksize", attrs)})(&self.ksize)?
         }
         {
@@ -14200,7 +14618,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPool<T>
+pub struct MaxPool<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_QINT8_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF,
@@ -14328,6 +14746,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("beta", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -14335,7 +14756,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LRN<T>
+pub struct LRN<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_BFLOAT16_or_DT_HALF,
@@ -14463,6 +14884,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("validate_indices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -14470,7 +14894,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DenseToSparseSetOperation<T>
+pub struct DenseToSparseSetOperation<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_INT64_or_DT_UINT16,
@@ -14590,6 +15014,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.t)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -14597,7 +15024,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct L2Loss<T>
+pub struct L2Loss<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -14700,6 +15127,12 @@ where TInput: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("TInput", TInput::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -14707,7 +15140,7 @@ where TInput: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPool3DGrad<TInput, T>
+pub struct MaxPool3DGrad<TInput, T>
 where TInput: TensorType,
       TInput: Clone,
       T: TensorType,
@@ -14826,6 +15259,9 @@ where T: TensorType,
             new_op.add_edge(&self.delta)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -14838,7 +15274,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyGradientDescent<T>
+pub struct ApplyGradientDescent<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -14945,6 +15381,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -14952,7 +15391,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPool3D<T>
+pub struct MaxPool3D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_BFLOAT16_or_DT_HALF,
@@ -15062,6 +15501,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -15069,7 +15511,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AvgPool3D<T>
+pub struct AvgPool3D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -15185,6 +15627,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -15192,7 +15637,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPool3DGradGrad<T>
+pub struct MaxPool3DGradGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -15300,6 +15745,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -15324,7 +15772,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv3DBackpropFilterV2<T>
+pub struct Conv3DBackpropFilterV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -15434,6 +15882,9 @@ where T: TensorType,
             new_op.add_edge(&self.filter)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -15458,7 +15909,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv3D<T>
+pub struct Conv3D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -15568,6 +16019,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -15592,7 +16046,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DepthwiseConv2dNativeBackpropFilter<T>
+pub struct DepthwiseConv2dNativeBackpropFilter<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -15705,6 +16159,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -15729,7 +16186,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DepthwiseConv2dNativeBackpropInput<T>
+pub struct DepthwiseConv2dNativeBackpropInput<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -15839,6 +16296,9 @@ where T: TensorType,
             new_op.add_edge(&self.filter)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -15863,7 +16323,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DepthwiseConv2dNative<T>
+pub struct DepthwiseConv2dNative<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -15985,6 +16445,9 @@ where T: TensorType,
             new_op.add_edge(&self.filter)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.resize_align_corners {
                 None => new_op.set_attr_value_proto("resize_align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("resize_align_corners", *attr)})(&value)?,
@@ -16006,7 +16469,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FusedResizeAndPadConv2D<T>
+pub struct FusedResizeAndPadConv2D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -16111,6 +16574,9 @@ where T: TensorType,
             new_op.add_edge(&self.x)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.src_format {
                 None => new_op.set_attr_value_proto("src_format", &vec![18_u8, 4_u8, 78_u8, 72_u8, 87_u8, 67_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("src_format", attr)})(&value)?,
@@ -16129,7 +16595,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DataFormatVecPermute<T>
+pub struct DataFormatVecPermute<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -16230,6 +16696,9 @@ where T: TensorType,
             new_op.add_edge(&self.args)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_args", *attr)})(&self.num_args)?
         }
         {
@@ -16269,7 +16738,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _FusedConv2D<T>
+pub struct _FusedConv2D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -16398,6 +16867,9 @@ where T: TensorType,
             new_op.add_edge(&self.filter)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -16413,7 +16885,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Dilation2D<T>
+pub struct Dilation2D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -16483,6 +16955,7 @@ where T: TensorType,
 
 impl<dtype> GraphOperation for ConditionalAccumulator<dtype>
 where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
+      dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
 {
@@ -16499,6 +16972,9 @@ where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or
             None => graph.new_op_name("ConditionalAccumulator_{}")?
         };
         let mut new_op = graph.new_operation("ConditionalAccumulator", &op_name)?;
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
@@ -16527,8 +17003,9 @@ where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or
 }
 
 #[derive(Clone)]
-struct ConditionalAccumulator<dtype>
+pub struct ConditionalAccumulator<dtype>
 where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
+      dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
 {
@@ -16543,6 +17020,7 @@ where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or
 
 impl<dtype> ConditionalAccumulator<dtype>
 where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
+      dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
 {
@@ -16630,6 +17108,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.flow_in)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.element_shape_except0 {
                 None => new_op.set_attr_value_proto("element_shape_except0", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("element_shape_except0", attr)})(&value)?,
@@ -16642,7 +17123,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayConcatV2<dtype>
+pub struct TensorArrayConcatV2<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -16746,6 +17227,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.serialized_summary_metadata)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -16753,7 +17237,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorSummaryV2<T>
+pub struct TensorSummaryV2<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -16852,7 +17336,7 @@ impl GraphOperation for RetrieveTPUEmbeddingProximalAdagradParametersGradAccumDe
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingProximalAdagradParametersGradAccumDebug {
+pub struct RetrieveTPUEmbeddingProximalAdagradParametersGradAccumDebug {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -16990,6 +17474,12 @@ where T: TensorType,
             new_op.add_edge(&self.indices)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -17002,7 +17492,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyCenteredRMSProp<T, Tindices>
+pub struct SparseApplyCenteredRMSProp<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -17164,7 +17654,7 @@ impl GraphOperation for RecordInput {
 }
 
 #[derive(Clone)]
-struct RecordInput {
+pub struct RecordInput {
     file_pattern: String,
     file_random_seed: Option<i64>,
     file_shuffle_shift_ratio: Option<f32>,
@@ -17301,6 +17791,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -17308,7 +17801,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Round<T>
+pub struct Round<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -17365,7 +17858,8 @@ where T: TensorType,
 }
 
 impl<dtypes> GraphOperation for OrderedMapClear<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -17394,6 +17888,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -17412,8 +17909,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct OrderedMapClear<dtypes>
-where dtypes: 'static,
+pub struct OrderedMapClear<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -17426,7 +17924,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> OrderedMapClear<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn capacity(&mut self, capacity: i64) -> Self {
@@ -17486,7 +17985,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> GraphOperation for MapClear<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -17515,6 +18015,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -17533,8 +18036,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct MapClear<dtypes>
-where dtypes: 'static,
+pub struct MapClear<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -17547,7 +18051,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> MapClear<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn capacity(&mut self, capacity: i64) -> Self {
@@ -17607,7 +18112,8 @@ where dtypes: 'static,
 }
 
 impl<dtype> GraphOperation for TensorArrayV2<dtype>
-where dtype: 'static,
+where dtype: TensorType,
+      dtype: 'static,
       dtype: Clone,
 {
     fn get_id(&self) -> usize {
@@ -17625,6 +18131,9 @@ where dtype: 'static,
         let mut new_op = graph.new_operation("TensorArrayV2", &op_name)?;
         {
             new_op.add_edge(&self.size)?
+        }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
         }
         {
             match self.element_shape {
@@ -17657,8 +18166,9 @@ where dtype: 'static,
 }
 
 #[derive(Clone)]
-struct TensorArrayV2<dtype>
-where dtype: 'static,
+pub struct TensorArrayV2<dtype>
+where dtype: TensorType,
+      dtype: 'static,
       dtype: Clone,
 {
     size: Edge<i32>,
@@ -17672,7 +18182,8 @@ where dtype: 'static,
 }
 
 impl<dtype> TensorArrayV2<dtype>
-where dtype: 'static,
+where dtype: TensorType,
+      dtype: 'static,
       dtype: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -17781,6 +18292,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -17788,7 +18302,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Acosh<T>
+pub struct Acosh<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -17845,7 +18359,8 @@ where T: TensorType,
 }
 
 impl<dtypes> GraphOperation for MapSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -17874,6 +18389,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -17892,8 +18410,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct MapSize<dtypes>
-where dtypes: 'static,
+pub struct MapSize<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -17906,7 +18425,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> MapSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn size(self) -> Edge<i32> {
@@ -18008,6 +18528,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.axis)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tshift", Tshift::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Taxis", Taxis::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -18015,7 +18544,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Roll<T, Tshift, Taxis>
+pub struct Roll<T, Tshift, Taxis>
 where T: TensorType,
       T: Clone,
       Tshift: TensorType,
@@ -18098,7 +18627,8 @@ where T: TensorType,
 }
 
 impl<dtypes> GraphOperation for StageClear<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -18127,6 +18657,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -18145,8 +18678,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct StageClear<dtypes>
-where dtypes: 'static,
+pub struct StageClear<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -18159,7 +18693,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> StageClear<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn capacity(&mut self, capacity: i64) -> Self {
@@ -18254,7 +18789,7 @@ impl GraphOperation for NonMaxSuppressionWithOverlaps {
 }
 
 #[derive(Clone)]
-struct NonMaxSuppressionWithOverlaps {
+pub struct NonMaxSuppressionWithOverlaps {
     overlaps: Edge<f32>,
     scores: Edge<f32>,
     max_output_size: Edge<i32>,
@@ -18349,6 +18884,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -18356,7 +18894,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AvgPoolGrad<T>
+pub struct AvgPoolGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -18433,7 +18971,8 @@ where T: TensorType,
 }
 
 impl<dtypes> GraphOperation for StageSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -18462,6 +19001,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -18480,8 +19022,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct StageSize<dtypes>
-where dtypes: 'static,
+pub struct StageSize<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -18494,7 +19037,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> StageSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn size(self) -> Edge<i32> {
@@ -18594,6 +19138,9 @@ where Tshape: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -18611,6 +19158,9 @@ where Tshape: TensorType,
                 Some(ref value) => (|attrs| {new_op.set_attr_int_list("dilations", attrs)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("Tshape", Tshape::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -18618,7 +19168,7 @@ where Tshape: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv3DBackpropInputV2<Tshape, T>
+pub struct Conv3DBackpropInputV2<Tshape, T>
 where Tshape: TensorType,
       Tshape: Clone,
       T: TensorType,
@@ -18735,6 +19285,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("block_size", *attr)})(&self.block_size)?
         }
         {
@@ -18750,7 +19303,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DepthToSpace<T>
+pub struct DepthToSpace<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -18839,7 +19392,7 @@ impl GraphOperation for BarrierReadySize {
 }
 
 #[derive(Clone)]
-struct BarrierReadySize {
+pub struct BarrierReadySize {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -18930,7 +19483,7 @@ impl GraphOperation for FakeQuantWithMinMaxArgs {
 }
 
 #[derive(Clone)]
-struct FakeQuantWithMinMaxArgs {
+pub struct FakeQuantWithMinMaxArgs {
     inputs: Edge<f32>,
     min: Option<f32>,
     max: Option<f32>,
@@ -19035,7 +19588,7 @@ impl GraphOperation for BarrierClose {
 }
 
 #[derive(Clone)]
-struct BarrierClose {
+pub struct BarrierClose {
     handle: Edge<String>,
     cancel_pending_enqueues: Option<bool>,
     op_name: Option<String>,
@@ -19106,6 +19659,9 @@ where T: TensorType,
             new_op.add_edge(&self.values)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("component_index", *attr)})(&self.component_index)?
         }
         let op = new_op.finish()?;
@@ -19115,7 +19671,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BarrierInsertMany<T>
+pub struct BarrierInsertMany<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -19192,6 +19748,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -19199,7 +19758,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Erf<T>
+pub struct Erf<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -19277,6 +19836,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -19284,7 +19846,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Floor<T>
+pub struct Floor<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -19367,7 +19929,7 @@ impl GraphOperation for TensorArraySizeV2 {
 }
 
 #[derive(Clone)]
-struct TensorArraySizeV2 {
+pub struct TensorArraySizeV2 {
     handle: Edge<String>,
     flow_in: Edge<f32>,
     op_name: Option<String>,
@@ -19438,6 +20000,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.flow_in)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.element_shape_except0 {
                 None => new_op.set_attr_value_proto("element_shape_except0", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("element_shape_except0", attr)})(&value)?,
@@ -19450,7 +20015,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayConcat<dtype>
+pub struct TensorArrayConcat<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -19564,6 +20129,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -19571,7 +20139,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixSquareRoot<T>
+pub struct MatrixSquareRoot<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -19678,6 +20246,12 @@ where T: TensorType,
             new_op.add_edge(&self.global_step)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -19690,7 +20264,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyAdagradDA<T, Tindices>
+pub struct SparseApplyAdagradDA<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -19814,6 +20388,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -19821,7 +20398,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DivNoNan<T>
+pub struct DivNoNan<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -19910,6 +20487,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -19917,7 +20497,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayScatter<T>
+pub struct TensorArrayScatter<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -20017,6 +20597,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -20024,7 +20607,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseReduceMax<T>
+pub struct SparseReduceMax<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -20124,6 +20707,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -20131,7 +20717,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayUnpack<T>
+pub struct TensorArrayUnpack<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -20218,7 +20804,7 @@ impl GraphOperation for _ConfigureDistributedTPU {
 }
 
 #[derive(Clone)]
-struct _ConfigureDistributedTPU {
+pub struct _ConfigureDistributedTPU {
     inputs: Edge<i32>,
     N: i64,
     op_name: Option<String>,
@@ -20294,7 +20880,7 @@ impl GraphOperation for TensorArrayGradV2 {
 }
 
 #[derive(Clone)]
-struct TensorArrayGradV2 {
+pub struct TensorArrayGradV2 {
     handle: Edge<String>,
     flow_in: Edge<f32>,
     source: String,
@@ -20364,6 +20950,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -20371,7 +20960,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DebugGradientIdentity<T>
+pub struct DebugGradientIdentity<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -20426,7 +21015,8 @@ where T: TensorType,
 }
 
 impl<dtype> GraphOperation for TensorArray<dtype>
-where dtype: 'static,
+where dtype: TensorType,
+      dtype: 'static,
       dtype: Clone,
 {
     fn get_id(&self) -> usize {
@@ -20444,6 +21034,9 @@ where dtype: 'static,
         let mut new_op = graph.new_operation("TensorArray", &op_name)?;
         {
             new_op.add_edge(&self.size)?
+        }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
         }
         {
             match self.dynamic_size {
@@ -20476,8 +21069,9 @@ where dtype: 'static,
 }
 
 #[derive(Clone)]
-struct TensorArray<dtype>
-where dtype: 'static,
+pub struct TensorArray<dtype>
+where dtype: TensorType,
+      dtype: 'static,
       dtype: Clone,
 {
     size: Edge<i32>,
@@ -20491,7 +21085,8 @@ where dtype: 'static,
 }
 
 impl<dtype> TensorArray<dtype>
-where dtype: 'static,
+where dtype: TensorType,
+      dtype: 'static,
       dtype: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -20585,6 +21180,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.outputs)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -20592,7 +21190,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SeluGrad<T>
+pub struct SeluGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -20675,7 +21273,7 @@ impl GraphOperation for StackClose {
 }
 
 #[derive(Clone)]
-struct StackClose {
+pub struct StackClose {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -20740,7 +21338,7 @@ impl GraphOperation for DecodeCompressed {
 }
 
 #[derive(Clone)]
-struct DecodeCompressed {
+pub struct DecodeCompressed {
     bytes: Edge<String>,
     compression_type: Option<String>,
     op_name: Option<String>,
@@ -20823,6 +21421,9 @@ where T: TensorType,
             new_op.add_edge(&self.params)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.rnn_mode {
                 None => new_op.set_attr_value_proto("rnn_mode", &vec![18_u8, 4_u8, 108_u8, 115_u8, 116_u8, 109_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("rnn_mode", attr)})(&value)?,
@@ -20871,7 +21472,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CudnnRNN<T>
+pub struct CudnnRNN<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -21025,7 +21626,8 @@ where T: TensorType,
 }
 
 impl<dtypes> GraphOperation for MapIncompleteSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -21054,6 +21656,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -21072,8 +21677,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct MapIncompleteSize<dtypes>
-where dtypes: 'static,
+pub struct MapIncompleteSize<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -21086,7 +21692,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> MapIncompleteSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn size(self) -> Edge<i32> {
@@ -21182,6 +21789,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -21200,7 +21810,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv3DBackpropInput<T>
+pub struct Conv3DBackpropInput<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -21301,6 +21911,9 @@ where T: TensorType,
             new_op.add_edge(&self.elem)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.swap_memory {
                 None => new_op.set_attr_value_proto("swap_memory", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("swap_memory", *attr)})(&value)?,
@@ -21313,7 +21926,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StackPush<T>
+pub struct StackPush<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -21412,6 +22025,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("validate_indices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -21419,7 +22035,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DenseToDenseSetOperation<T>
+pub struct DenseToDenseSetOperation<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_INT64_or_DT_UINT16,
@@ -21541,7 +22157,7 @@ impl GraphOperation for ShardedFilename {
 }
 
 #[derive(Clone)]
-struct ShardedFilename {
+pub struct ShardedFilename {
     basename: Edge<String>,
     shard: Edge<i32>,
     num_shards: Edge<i32>,
@@ -21625,6 +22241,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.gradient_shape)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr: &bool| {new_op.set_attr_bool("has_known_shape", *attr)})(&self.has_known_shape)?
         }
         let op = new_op.finish()?;
@@ -21634,7 +22253,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseAccumulatorApplyGradient<dtype>
+pub struct SparseAccumulatorApplyGradient<dtype>
 where dtype: TensorType,
       dtype: Clone,
       dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -21724,7 +22343,7 @@ impl GraphOperation for AccumulatorSetGlobalStep {
 }
 
 #[derive(Clone)]
-struct AccumulatorSetGlobalStep {
+pub struct AccumulatorSetGlobalStep {
     handle: Edge<String>,
     new_global_step: Edge<i64>,
     op_name: Option<String>,
@@ -21783,6 +22402,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -21790,7 +22412,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixDiagPart<T>
+pub struct MatrixDiagPart<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -21866,6 +22488,9 @@ where output_type: TensorType,
         {
             new_op.add_edge(&self.contents)?
         }
+        {
+            new_op.set_attr_type("output_type", output_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -21873,7 +22498,7 @@ where output_type: TensorType,
 }
 
 #[derive(Clone)]
-struct ExtractJpegShape<output_type>
+pub struct ExtractJpegShape<output_type>
 where output_type: TensorType,
       output_type: con_or_DT_INT32_or_DT_INT64,
       output_type: 'static,
@@ -21950,6 +22575,9 @@ where elem_type: TensorType,
         {
             new_op.add_edge(&self.handle)?
         }
+        {
+            new_op.set_attr_type("elem_type", elem_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -21957,7 +22585,7 @@ where elem_type: TensorType,
 }
 
 #[derive(Clone)]
-struct StackPop<elem_type>
+pub struct StackPop<elem_type>
 where elem_type: TensorType,
       elem_type: 'static,
       elem_type: Clone,
@@ -22033,6 +22661,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -22040,7 +22671,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Inv<T>
+pub struct Inv<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -22123,6 +22754,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -22130,7 +22764,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ParallelDynamicStitch<T>
+pub struct ParallelDynamicStitch<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -22217,6 +22851,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("num_partitions", *attr)})(&self.num_partitions)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -22224,7 +22861,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DynamicPartition<T>
+pub struct DynamicPartition<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -22306,6 +22943,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -22313,7 +22953,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchCholesky<T>
+pub struct BatchCholesky<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -22373,6 +23013,7 @@ impl<key_dtype, value_dtype> GraphOperation for MutableDenseHashTable<key_dtype,
 where key_dtype: TensorType,
       key_dtype: Clone,
       key_dtype: 'static,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -22411,6 +23052,12 @@ where key_dtype: TensorType,
             };
         }
         {
+            new_op.set_attr_type("key_dtype", key_dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("value_dtype", value_dtype::data_type())?;
+        }
+        {
             match self.value_shape {
                 None => new_op.set_attr_value_proto("value_shape", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("value_shape", attr)})(&value)?,
@@ -22435,10 +23082,11 @@ where key_dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct MutableDenseHashTable<key_dtype, value_dtype>
+pub struct MutableDenseHashTable<key_dtype, value_dtype>
 where key_dtype: TensorType,
       key_dtype: Clone,
       key_dtype: 'static,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -22459,6 +23107,7 @@ impl<key_dtype, value_dtype> MutableDenseHashTable<key_dtype, value_dtype>
 where key_dtype: TensorType,
       key_dtype: Clone,
       key_dtype: 'static,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -22592,7 +23241,7 @@ impl GraphOperation for UniformCandidateSampler {
 }
 
 #[derive(Clone)]
-struct UniformCandidateSampler {
+pub struct UniformCandidateSampler {
     true_classes: Edge<i64>,
     num_true: i64,
     num_sampled: i64,
@@ -22717,6 +23366,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -22724,7 +23379,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentMean<T, Tidx>
+pub struct SparseSegmentMean<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -22822,6 +23477,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.grad)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -22829,7 +23487,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchCholeskyGrad<T>
+pub struct BatchCholeskyGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -22939,7 +23597,7 @@ impl GraphOperation for CTCLoss {
 }
 
 #[derive(Clone)]
-struct CTCLoss {
+pub struct CTCLoss {
     inputs: Edge<f32>,
     labels_indices: Edge<i64>,
     labels_values: Edge<i32>,
@@ -23051,6 +23709,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.grad_values)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -23058,7 +23719,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseFillEmptyRowsGrad<T>
+pub struct SparseFillEmptyRowsGrad<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -23188,6 +23849,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -23195,7 +23859,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct OnesLike<T>
+pub struct OnesLike<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BOOL_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -23294,6 +23958,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -23301,7 +23968,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Mod<T>
+pub struct Mod<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16_or_DT_HALF_or_DT_HALF,
@@ -23393,7 +24060,7 @@ impl GraphOperation for Abort {
 }
 
 #[derive(Clone)]
-struct Abort {
+pub struct Abort {
     error_msg: Option<String>,
     exit_without_error: Option<bool>,
     op_name: Option<String>,
@@ -23489,7 +24156,7 @@ impl GraphOperation for LoadTPUEmbeddingProximalAdagradParametersGradAccumDebug 
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingProximalAdagradParametersGradAccumDebug {
+pub struct LoadTPUEmbeddingProximalAdagradParametersGradAccumDebug {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     gradient_accumulators: Edge<f32>,
@@ -23576,7 +24243,7 @@ impl GraphOperation for LoopCond {
 }
 
 #[derive(Clone)]
-struct LoopCond {
+pub struct LoopCond {
     input: Edge<bool>,
     op_name: Option<String>,
     id_: usize,
@@ -23644,6 +24311,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -23651,7 +24321,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SquaredDifference<T>
+pub struct SquaredDifference<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -23751,6 +24421,12 @@ where S: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("S", S::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -23758,7 +24434,7 @@ where S: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomGamma<S, T>
+pub struct RandomGamma<S, T>
 where S: TensorType,
       S: Clone,
       T: TensorType,
@@ -23876,6 +24552,12 @@ where Tinput: TensorType,
         {
             new_op.add_edge(&self.input_max)?
         }
+        {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -23883,7 +24565,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizeDownAndShrinkRange<Tinput, out_type>
+pub struct QuantizeDownAndShrinkRange<Tinput, out_type>
 where Tinput: TensorType,
       Tinput: Clone,
       out_type: TensorType,
@@ -23999,7 +24681,7 @@ impl GraphOperation for Fact {
 }
 
 #[derive(Clone)]
-struct Fact {
+pub struct Fact {
     op_name: Option<String>,
     id_: usize,
 }
@@ -24060,6 +24742,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.data)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24067,7 +24752,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NextIteration<T>
+pub struct NextIteration<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -24143,6 +24828,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24150,7 +24838,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Lgamma<T>
+pub struct Lgamma<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -24227,6 +24915,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24234,7 +24925,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Snapshot<T>
+pub struct Snapshot<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -24309,6 +25000,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.data)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24316,7 +25010,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RefExit<T>
+pub struct RefExit<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -24401,6 +25095,12 @@ where Tindices: TensorType,
         {
             new_op.add_edge(&self.shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24408,7 +25108,7 @@ where Tindices: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterNd<Tindices, T>
+pub struct ScatterNd<Tindices, T>
 where Tindices: TensorType,
       Tindices: Clone,
       T: TensorType,
@@ -24501,6 +25201,9 @@ where T: TensorType,
             new_op.add_edge(&self.inputs)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
         let op = new_op.finish()?;
@@ -24510,7 +25213,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RefMerge<T>
+pub struct RefMerge<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -24603,6 +25306,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.pred)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24610,7 +25316,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Switch<T>
+pub struct Switch<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -24703,7 +25409,7 @@ impl GraphOperation for DecodeBase64 {
 }
 
 #[derive(Clone)]
-struct DecodeBase64 {
+pub struct DecodeBase64 {
     input: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -24781,6 +25487,9 @@ where T: TensorType,
         };
         let mut new_op = graph.new_operation("CollectiveBcastRecv", &op_name)?;
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("group_size", *attr)})(&self.group_size)?
         }
         {
@@ -24799,7 +25508,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CollectiveBcastRecv<T>
+pub struct CollectiveBcastRecv<T>
 where T: TensorType,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
       T: 'static,
@@ -24886,6 +25595,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24893,7 +25605,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Rsqrt<T>
+pub struct Rsqrt<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -24973,6 +25685,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.pred)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -24980,7 +25695,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RefSwitch<T>
+pub struct RefSwitch<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -25072,6 +25787,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("group_size", *attr)})(&self.group_size)?
         }
         {
@@ -25090,7 +25808,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CollectiveBcastSend<T>
+pub struct CollectiveBcastSend<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -25179,6 +25897,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -25186,7 +25907,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DeepCopy<T>
+pub struct DeepCopy<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -25263,6 +25984,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("group_size", *attr)})(&self.group_size)?
         }
         {
@@ -25287,7 +26011,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CollectiveReduce<T>
+pub struct CollectiveReduce<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -25383,6 +26107,9 @@ where T: TensorType,
             new_op.add_edge(&self.data)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("frame_name", attr)})(&self.frame_name)?
         }
         {
@@ -25404,7 +26131,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RefEnter<T>
+pub struct RefEnter<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -25561,7 +26288,7 @@ impl GraphOperation for FixedUnigramCandidateSampler {
 }
 
 #[derive(Clone)]
-struct FixedUnigramCandidateSampler {
+pub struct FixedUnigramCandidateSampler {
     true_classes: Edge<i64>,
     num_true: i64,
     num_sampled: i64,
@@ -25726,7 +26453,7 @@ impl GraphOperation for BarrierIncompleteSize {
 }
 
 #[derive(Clone)]
-struct BarrierIncompleteSize {
+pub struct BarrierIncompleteSize {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -25798,6 +26525,9 @@ where T: TensorType,
             new_op.add_edge(&self.strides)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("padding", attr)})(&self.padding)?
         }
         {
@@ -25813,7 +26543,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolV2<T>
+pub struct MaxPoolV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_QINT8_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF,
@@ -25934,7 +26664,7 @@ impl GraphOperation for ThreadUnsafeUnigramCandidateSampler {
 }
 
 #[derive(Clone)]
-struct ThreadUnsafeUnigramCandidateSampler {
+pub struct ThreadUnsafeUnigramCandidateSampler {
     true_classes: Edge<i64>,
     num_true: i64,
     num_sampled: i64,
@@ -26051,7 +26781,7 @@ impl GraphOperation for QueueIsClosed {
 }
 
 #[derive(Clone)]
-struct QueueIsClosed {
+pub struct QueueIsClosed {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -26095,7 +26825,8 @@ impl QueueIsClosed {
 }
 
 impl<component_types> GraphOperation for FIFOQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     fn get_id(&self) -> usize {
@@ -26111,6 +26842,9 @@ where component_types: 'static,
             None => graph.new_op_name("FIFOQueue_{}")?
         };
         let mut new_op = graph.new_operation("FIFOQueue", &op_name)?;
+        {
+            new_op.set_attr_type("component_types", component_types::data_type())?;
+        }
         {
             match self.shapes {
                 None => new_op.set_attr_value_proto("shapes", &vec![10_u8, 0_u8,])?,
@@ -26142,8 +26876,9 @@ where component_types: 'static,
 }
 
 #[derive(Clone)]
-struct FIFOQueue<component_types>
-where component_types: 'static,
+pub struct FIFOQueue<component_types>
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     phantom_component_types: PhantomData<component_types>,
@@ -26156,7 +26891,8 @@ where component_types: 'static,
 }
 
 impl<component_types> FIFOQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -26247,6 +26983,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -26254,7 +26993,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TPUReplicatedInput<T>
+pub struct TPUReplicatedInput<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -26333,6 +27072,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("block_size", *attr)})(&self.block_size)?
         }
         {
@@ -26348,7 +27090,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SpaceToDepth<T>
+pub struct SpaceToDepth<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -26461,7 +27203,7 @@ impl GraphOperation for LogUniformCandidateSampler {
 }
 
 #[derive(Clone)]
-struct LogUniformCandidateSampler {
+pub struct LogUniformCandidateSampler {
     true_classes: Edge<i64>,
     num_true: i64,
     num_sampled: i64,
@@ -26595,6 +27337,12 @@ where S: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("S", S::data_type())?;
+        }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -26602,7 +27350,7 @@ where S: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomPoisson<S, dtype>
+pub struct RandomPoisson<S, dtype>
 where S: TensorType,
       S: Clone,
       dtype: TensorType,
@@ -26723,6 +27471,12 @@ where Tinput: TensorType,
         {
             new_op.add_edge(&self.max_features)?
         }
+        {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -26730,7 +27484,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedReluX<Tinput, out_type>
+pub struct QuantizedReluX<Tinput, out_type>
 where Tinput: TensorType,
       Tinput: Clone,
       out_type: TensorType,
@@ -26853,6 +27607,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -26860,7 +27617,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Less<T>
+pub struct Less<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -26940,6 +27697,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -26947,7 +27707,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct OutfeedEnqueue<dtype>
+pub struct OutfeedEnqueue<dtype>
 where dtype: TensorType,
       dtype: Clone,
       dtype: 'static,
@@ -27018,6 +27778,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -27025,7 +27788,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct HistogramSummary<T>
+pub struct HistogramSummary<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -27105,7 +27868,7 @@ impl GraphOperation for _ShutdownDistributedTPU {
 }
 
 #[derive(Clone)]
-struct _ShutdownDistributedTPU {
+pub struct _ShutdownDistributedTPU {
     op_name: Option<String>,
     id_: usize,
 }
@@ -27167,6 +27930,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -27174,7 +27940,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayWriteV2<T>
+pub struct TensorArrayWriteV2<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -27268,6 +28034,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.size_indices)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -27275,7 +28047,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaDynamicSlice<T, Tindices>
+pub struct XlaDynamicSlice<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -27373,7 +28145,7 @@ impl GraphOperation for AdjustHue {
 }
 
 #[derive(Clone)]
-struct AdjustHue {
+pub struct AdjustHue {
     images: Edge<f32>,
     delta: Edge<f32>,
     op_name: Option<String>,
@@ -27450,6 +28222,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.mkl_y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -27457,7 +28232,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _MklSquaredDifference<T>
+pub struct _MklSquaredDifference<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -27535,7 +28310,8 @@ where T: TensorType,
 }
 
 impl<component_types> GraphOperation for Barrier<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     fn get_id(&self) -> usize {
@@ -27551,6 +28327,9 @@ where component_types: 'static,
             None => graph.new_op_name("Barrier_{}")?
         };
         let mut new_op = graph.new_operation("Barrier", &op_name)?;
+        {
+            new_op.set_attr_type("component_types", component_types::data_type())?;
+        }
         {
             match self.shapes {
                 None => new_op.set_attr_value_proto("shapes", &vec![10_u8, 0_u8,])?,
@@ -27582,8 +28361,9 @@ where component_types: 'static,
 }
 
 #[derive(Clone)]
-struct Barrier<component_types>
-where component_types: 'static,
+pub struct Barrier<component_types>
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     phantom_component_types: PhantomData<component_types>,
@@ -27596,7 +28376,8 @@ where component_types: 'static,
 }
 
 impl<component_types> Barrier<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -27664,7 +28445,8 @@ where component_types: 'static,
 }
 
 impl<dtypes> GraphOperation for OrderedMapIncompleteSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -27693,6 +28475,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -27711,8 +28496,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct OrderedMapIncompleteSize<dtypes>
-where dtypes: 'static,
+pub struct OrderedMapIncompleteSize<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -27725,7 +28511,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> OrderedMapIncompleteSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn size(self) -> Edge<i32> {
@@ -27822,7 +28609,7 @@ impl GraphOperation for GcsConfigureBlockCache {
 }
 
 #[derive(Clone)]
-struct GcsConfigureBlockCache {
+pub struct GcsConfigureBlockCache {
     max_cache_size: Edge<u64>,
     block_size: Edge<u64>,
     max_staleness: Edge<u64>,
@@ -27864,7 +28651,8 @@ impl GcsConfigureBlockCache {
 }
 
 impl<dtypes> GraphOperation for OrderedMapSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     fn get_id(&self) -> usize {
@@ -27893,6 +28681,9 @@ where dtypes: 'static,
             };
         }
         {
+            new_op.set_attr_type("dtypes", dtypes::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -27911,8 +28702,9 @@ where dtypes: 'static,
 }
 
 #[derive(Clone)]
-struct OrderedMapSize<dtypes>
-where dtypes: 'static,
+pub struct OrderedMapSize<dtypes>
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     capacity: Option<i64>,
@@ -27925,7 +28717,8 @@ where dtypes: 'static,
 }
 
 impl<dtypes> OrderedMapSize<dtypes>
-where dtypes: 'static,
+where dtypes: TensorType,
+      dtypes: 'static,
       dtypes: Clone,
 {
     pub fn size(self) -> Edge<i32> {
@@ -28022,7 +28815,7 @@ impl GraphOperation for DecodeBmp {
 }
 
 #[derive(Clone)]
-struct DecodeBmp {
+pub struct DecodeBmp {
     contents: Edge<String>,
     channels: Option<i64>,
     op_name: Option<String>,
@@ -28133,7 +28926,7 @@ impl GraphOperation for DecodeJpeg {
 }
 
 #[derive(Clone)]
-struct DecodeJpeg {
+pub struct DecodeJpeg {
     contents: Edge<String>,
     channels: Option<i64>,
     ratio: Option<i64>,
@@ -28266,7 +29059,7 @@ impl GraphOperation for BoostedTreesMakeStatsSummary {
 }
 
 #[derive(Clone)]
-struct BoostedTreesMakeStatsSummary {
+pub struct BoostedTreesMakeStatsSummary {
     node_ids: Edge<i32>,
     gradients: Edge<f32>,
     hessians: Edge<f32>,
@@ -28366,7 +29159,7 @@ impl GraphOperation for RetrieveTPUEmbeddingCenteredRMSPropParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingCenteredRMSPropParameters {
+pub struct RetrieveTPUEmbeddingCenteredRMSPropParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -28486,6 +29279,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -28493,7 +29292,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ComplexAbs<T, Tout>
+pub struct ComplexAbs<T, Tout>
 where T: TensorType,
       T: Clone,
       Tout: TensorType,
@@ -28587,7 +29386,7 @@ impl GraphOperation for LogicalAnd {
 }
 
 #[derive(Clone)]
-struct LogicalAnd {
+pub struct LogicalAnd {
     x: Edge<bool>,
     y: Edge<bool>,
     op_name: Option<String>,
@@ -28657,7 +29456,7 @@ impl GraphOperation for DeleteSessionTensor {
 }
 
 #[derive(Clone)]
-struct DeleteSessionTensor {
+pub struct DeleteSessionTensor {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -28744,6 +29543,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -28751,7 +29553,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LeftShift<T>
+pub struct LeftShift<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_UINT32_or_DT_UINT64,
@@ -28835,6 +29637,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -28842,7 +29647,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BitwiseXor<T>
+pub struct BitwiseXor<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_UINT32_or_DT_UINT64,
@@ -28923,6 +29728,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -28930,7 +29738,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct PopulationCount<T>
+pub struct PopulationCount<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_UINT32_or_DT_UINT64,
@@ -29015,6 +29823,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -29022,7 +29836,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SegmentMean<T, Tindices>
+pub struct SegmentMean<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -29132,6 +29946,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -29139,7 +29956,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AvgPool3DGrad<T>
+pub struct AvgPool3DGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -29257,6 +30074,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("shared_name", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -29264,7 +30084,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UnbatchGrad<T>
+pub struct UnbatchGrad<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -29364,6 +30184,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -29371,7 +30194,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DebugGradientRefIdentity<T>
+pub struct DebugGradientRefIdentity<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -29451,6 +30274,9 @@ where T: TensorType,
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         let op = new_op.finish()?;
@@ -29460,7 +30286,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AccumulateNV2<T>
+pub struct AccumulateNV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -29543,6 +30369,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -29550,7 +30379,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaSort<T>
+pub struct XlaSort<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -29628,7 +30457,7 @@ impl GraphOperation for ReaderReset {
 }
 
 #[derive(Clone)]
-struct ReaderReset {
+pub struct ReaderReset {
     reader_handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -29702,7 +30531,7 @@ impl GraphOperation for CTCBeamSearchDecoder {
 }
 
 #[derive(Clone)]
-struct CTCBeamSearchDecoder {
+pub struct CTCBeamSearchDecoder {
     inputs: Edge<f32>,
     sequence_length: Edge<i32>,
     beam_width: i64,
@@ -29830,7 +30659,7 @@ impl GraphOperation for AudioSpectrogram {
 }
 
 #[derive(Clone)]
-struct AudioSpectrogram {
+pub struct AudioSpectrogram {
     input: Edge<f32>,
     window_size: i64,
     stride: i64,
@@ -29934,6 +30763,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -29946,7 +30778,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyAdaMax<T>
+pub struct ApplyAdaMax<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -30059,6 +30891,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.sample)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -30066,7 +30901,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomGammaGrad<T>
+pub struct RandomGammaGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -30186,6 +31021,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -30193,7 +31031,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Add<T>
+pub struct Add<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -30297,6 +31135,15 @@ where T1: TensorType,
         {
             new_op.add_edge(&self.max_y)?
         }
+        {
+            new_op.set_attr_type("T1", T1::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T2", T2::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Toutput", Toutput::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -30304,7 +31151,7 @@ where T1: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedAdd<T1, T2, Toutput>
+pub struct QuantizedAdd<T1, T2, Toutput>
 where T1: TensorType,
       T1: Clone,
       T2: TensorType,
@@ -30455,7 +31302,7 @@ impl GraphOperation for DecodeWav {
 }
 
 #[derive(Clone)]
-struct DecodeWav {
+pub struct DecodeWav {
     contents: Edge<String>,
     desired_channels: Option<i64>,
     desired_samples: Option<i64>,
@@ -30551,6 +31398,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_idx", out_idx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -30558,7 +31411,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Unique<T, out_idx>
+pub struct Unique<T, out_idx>
 where T: TensorType,
       T: Clone,
       out_idx: TensorType,
@@ -30660,6 +31513,9 @@ where T: TensorType,
             new_op.add_edge(&self.inputs)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
         let op = new_op.finish()?;
@@ -30669,7 +31525,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RefSelect<T>
+pub struct RefSelect<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -30758,6 +31614,12 @@ where T: TensorType,
             new_op.add_edge(&self.paddings)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tpaddings", Tpaddings::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("mode", attr)})(&self.mode)?
         }
         let op = new_op.finish()?;
@@ -30767,7 +31629,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MirrorPad<T, Tpaddings>
+pub struct MirrorPad<T, Tpaddings>
 where T: TensorType,
       T: Clone,
       Tpaddings: TensorType,
@@ -30883,7 +31745,7 @@ impl GraphOperation for FakeQuantWithMinMaxVarsPerChannelGradient {
 }
 
 #[derive(Clone)]
-struct FakeQuantWithMinMaxVarsPerChannelGradient {
+pub struct FakeQuantWithMinMaxVarsPerChannelGradient {
     gradients: Edge<f32>,
     inputs: Edge<f32>,
     min: Edge<f32>,
@@ -31000,6 +31862,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -31007,7 +31872,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayRead<dtype>
+pub struct TensorArrayRead<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -31095,6 +31960,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -31102,7 +31970,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Betainc<T>
+pub struct Betainc<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -31206,7 +32074,7 @@ impl GraphOperation for FakeQuantWithMinMaxVarsPerChannel {
 }
 
 #[derive(Clone)]
-struct FakeQuantWithMinMaxVarsPerChannel {
+pub struct FakeQuantWithMinMaxVarsPerChannel {
     inputs: Edge<f32>,
     min: Edge<f32>,
     max: Edge<f32>,
@@ -31299,6 +32167,12 @@ where K: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("K", K::data_type())?;
+        }
+        {
+            new_op.set_attr_type("V", V::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -31306,7 +32180,7 @@ where K: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaKeyValueSort<K, V>
+pub struct XlaKeyValueSort<K, V>
 where K: TensorType,
       K: Clone,
       V: TensorType,
@@ -31434,7 +32308,7 @@ impl GraphOperation for LoadTPUEmbeddingFTRLParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingFTRLParameters {
+pub struct LoadTPUEmbeddingFTRLParameters {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     linears: Edge<f32>,
@@ -31528,6 +32402,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.indices)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -31535,7 +32415,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaDynamicUpdateSlice<T, Tindices>
+pub struct XlaDynamicUpdateSlice<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -31628,6 +32508,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.shape)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.init {
                 None => new_op.set_attr_value_proto("init", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("init", *attr)})(&value)?,
@@ -31640,7 +32523,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct Empty<dtype>
+pub struct Empty<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -31741,7 +32624,7 @@ impl GraphOperation for RetrieveTPUEmbeddingMDLAdagradLightParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingMDLAdagradLightParameters {
+pub struct RetrieveTPUEmbeddingMDLAdagradLightParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -31890,6 +32773,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -31897,7 +32783,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FractionalAvgPool<T>
+pub struct FractionalAvgPool<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64,
@@ -32047,6 +32933,9 @@ where T: TensorType,
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("padding", attr)})(&self.padding)?
         }
         let op = new_op.finish()?;
@@ -32056,7 +32945,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ExtractVolumePatches<T>
+pub struct ExtractVolumePatches<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -32142,6 +33031,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.value)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -32149,7 +33041,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct GetSessionHandle<T>
+pub struct GetSessionHandle<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -32227,6 +33119,12 @@ where Tkeys: TensorType,
         {
             new_op.add_edge(&self.table_handle)?
         }
+        {
+            new_op.set_attr_type("Tkeys", Tkeys::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tvalues", Tvalues::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -32234,7 +33132,7 @@ where Tkeys: TensorType,
 }
 
 #[derive(Clone)]
-struct LookupTableExport<Tkeys, Tvalues>
+pub struct LookupTableExport<Tkeys, Tvalues>
 where Tkeys: TensorType,
       Tvalues: TensorType,
       Tkeys: 'static,
@@ -32337,6 +33235,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adjoint", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -32344,7 +33245,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixInverse<T>
+pub struct BatchMatrixInverse<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -32438,6 +33339,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -32445,7 +33349,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArraySplit<T>
+pub struct TensorArraySplit<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -32547,7 +33451,7 @@ impl GraphOperation for GenerateVocabRemapping {
 }
 
 #[derive(Clone)]
-struct GenerateVocabRemapping {
+pub struct GenerateVocabRemapping {
     new_vocab_file: Edge<String>,
     old_vocab_file: Edge<String>,
     new_vocab_offset: i64,
@@ -32643,7 +33547,7 @@ impl GraphOperation for _SetGlobalTPUArray {
 }
 
 #[derive(Clone)]
-struct _SetGlobalTPUArray {
+pub struct _SetGlobalTPUArray {
     topology: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -32703,6 +33607,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.num_required)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -32710,7 +33617,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct AccumulatorTakeGradient<dtype>
+pub struct AccumulatorTakeGradient<dtype>
 where dtype: TensorType,
       dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
       dtype: 'static,
@@ -32800,6 +33707,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.sparse_shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -32807,7 +33720,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SerializeSparse<T, out_type>
+pub struct SerializeSparse<T, out_type>
 where T: TensorType,
       T: Clone,
       out_type: TensorType,
@@ -32926,7 +33839,7 @@ impl GraphOperation for LearnedUnigramCandidateSampler {
 }
 
 #[derive(Clone)]
-struct LearnedUnigramCandidateSampler {
+pub struct LearnedUnigramCandidateSampler {
     true_classes: Edge<i64>,
     num_true: i64,
     num_sampled: i64,
@@ -33050,6 +33963,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.boxes)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -33057,7 +33973,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DrawBoundingBoxes<T>
+pub struct DrawBoundingBoxes<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_HALF,
@@ -33161,6 +34077,12 @@ where T: TensorType,
             new_op.add_edge(&self.padding)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_func_name("computation", attr)})(&self.computation)?
         }
         let op = new_op.finish()?;
@@ -33170,7 +34092,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaReduceWindow<T, Tindices>
+pub struct XlaReduceWindow<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -33300,6 +34222,12 @@ where T: TensorType,
             new_op.add_edge(&self.init_value)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_func_name("select", attr)})(&self.select)?
         }
         {
@@ -33312,7 +34240,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaSelectAndScatter<T, Tindices>
+pub struct XlaSelectAndScatter<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -33439,7 +34367,7 @@ impl GraphOperation for RetrieveTPUEmbeddingAdadeltaParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingAdadeltaParametersGradAccumDebug {
+pub struct RetrieveTPUEmbeddingAdadeltaParametersGradAccumDebug {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -33554,6 +34482,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.data)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -33561,7 +34492,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RefNextIteration<T>
+pub struct RefNextIteration<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -33636,6 +34567,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -33643,7 +34577,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ZerosLike<T>
+pub struct ZerosLike<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -33745,7 +34679,7 @@ impl GraphOperation for EnqueueTPUEmbeddingSparseBatch {
 }
 
 #[derive(Clone)]
-struct EnqueueTPUEmbeddingSparseBatch {
+pub struct EnqueueTPUEmbeddingSparseBatch {
     sample_indices: Edge<i32>,
     embedding_indices: Edge<i32>,
     aggregation_weights: Edge<f32>,
@@ -33840,6 +34774,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.axis)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Taxis", Taxis::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_idx", out_idx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -33847,7 +34790,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UniqueV2<T, Taxis, out_idx>
+pub struct UniqueV2<T, Taxis, out_idx>
 where T: TensorType,
       T: Clone,
       Taxis: TensorType,
@@ -33965,6 +34908,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.v)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -33972,7 +34918,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct InplaceAdd<T>
+pub struct InplaceAdd<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -34059,7 +35005,7 @@ impl GraphOperation for LogicalOr {
 }
 
 #[derive(Clone)]
-struct LogicalOr {
+pub struct LogicalOr {
     x: Edge<bool>,
     y: Edge<bool>,
     op_name: Option<String>,
@@ -34130,6 +35076,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -34137,7 +35086,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct IgammaGradA<T>
+pub struct IgammaGradA<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -34218,6 +35167,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.sparse_handles)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -34236,7 +35188,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TakeManySparseFromTensorsMap<dtype>
+pub struct TakeManySparseFromTensorsMap<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -34349,6 +35301,9 @@ where dtype: TensorType,
         {
             (|attr: &Rc<AnyTensor>| {new_op.set_attr_tensor_owned("value", attr.clone())})(&self.value)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -34356,7 +35311,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct Const<dtype>
+pub struct Const<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -34391,24 +35346,26 @@ where dtype: TensorType,
         }
     }
 
-    pub fn build<value_T>(value: value_T) -> Self
-    where value_T: AnyTensor,
+    pub fn build<value_T, value_TensorType>(value: value_T) -> Self
+    where Tensor<value_TensorType>: From<value_T>,
           value_T: 'static,
+          value_TensorType: TensorType,
     {
         Self {
-            value: Rc::new(value),
+            value: Rc::new(Tensor::<value_TensorType>::from(value)),
             phantom_dtype: PhantomData,
             op_name: None,
             id_: new_id(),
         }
     }
 
-    pub fn new<value_T>(value: value_T) -> Edge<dtype>
-    where value_T: AnyTensor,
+    pub fn new<value_T, value_TensorType>(value: value_T) -> Edge<dtype>
+    where Tensor<value_TensorType>: From<value_T>,
           value_T: 'static,
+          value_TensorType: TensorType,
     {
         Self {
-            value: Rc::new(value),
+            value: Rc::new(Tensor::<value_TensorType>::from(value)),
             phantom_dtype: PhantomData,
             op_name: None,
             id_: new_id(),
@@ -34467,7 +35424,7 @@ impl GraphOperation for EnqueueTPUEmbeddingSparseTensorBatch {
 }
 
 #[derive(Clone)]
-struct EnqueueTPUEmbeddingSparseTensorBatch {
+pub struct EnqueueTPUEmbeddingSparseTensorBatch {
     sample_indices: Edge<i32>,
     embedding_indices: Edge<i32>,
     aggregation_weights: Edge<f32>,
@@ -34575,7 +35532,7 @@ impl GraphOperation for LoadTPUEmbeddingStochasticGradientDescentParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingStochasticGradientDescentParameters {
+pub struct LoadTPUEmbeddingStochasticGradientDescentParameters {
     parameters: Edge<f32>,
     table_id: Option<i64>,
     table_name: Option<String>,
@@ -34693,6 +35650,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -34700,7 +35660,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Mul<T>
+pub struct Mul<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -34785,6 +35745,9 @@ where T: TensorType,
             new_op.add_edge(&self.bias)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.data_format {
                 None => new_op.set_attr_value_proto("data_format", &vec![18_u8, 4_u8, 78_u8, 72_u8, 87_u8, 67_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
@@ -34797,7 +35760,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BiasAdd<T>
+pub struct BiasAdd<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -34892,6 +35855,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dim)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tdim", Tdim::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -34899,7 +35868,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ExpandDims<T, Tdim>
+pub struct ExpandDims<T, Tdim>
 where T: TensorType,
       T: Clone,
       Tdim: TensorType,
@@ -34995,6 +35964,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.multiples)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tmultiples", Tmultiples::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -35002,7 +35977,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Tile<T, Tmultiples>
+pub struct Tile<T, Tmultiples>
 where T: TensorType,
       T: Clone,
       Tmultiples: TensorType,
@@ -35097,7 +36072,7 @@ impl GraphOperation for RecvTPUEmbeddingActivations {
 }
 
 #[derive(Clone)]
-struct RecvTPUEmbeddingActivations {
+pub struct RecvTPUEmbeddingActivations {
     num_outputs: i64,
     config: String,
     op_name: Option<String>,
@@ -35167,7 +36142,7 @@ impl GraphOperation for WorkerHeartbeat {
 }
 
 #[derive(Clone)]
-struct WorkerHeartbeat {
+pub struct WorkerHeartbeat {
     request: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -35237,6 +36212,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.e)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -35244,7 +36222,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Select<T>
+pub struct Select<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -35329,6 +36307,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dy)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -35336,7 +36317,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RsqrtGrad<T>
+pub struct RsqrtGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -35426,6 +36407,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.constant_values)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tpaddings", Tpaddings::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -35433,7 +36420,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct PadV2<T, Tpaddings>
+pub struct PadV2<T, Tpaddings>
 where T: TensorType,
       T: Clone,
       Tpaddings: TensorType,
@@ -35549,7 +36536,7 @@ impl GraphOperation for LoadTPUEmbeddingProximalAdagradParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingProximalAdagradParameters {
+pub struct LoadTPUEmbeddingProximalAdagradParameters {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     table_id: Option<i64>,
@@ -35638,6 +36625,12 @@ where T: TensorType,
             new_op.add_edge(&self.paddings)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tpaddings", Tpaddings::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("mode", attr)})(&self.mode)?
         }
         let op = new_op.finish()?;
@@ -35647,7 +36640,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MirrorPadGrad<T, Tpaddings>
+pub struct MirrorPadGrad<T, Tpaddings>
 where T: TensorType,
       T: Clone,
       Tpaddings: TensorType,
@@ -35782,6 +36775,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dims)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -35789,7 +36785,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Reverse<T>
+pub struct Reverse<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_COMPLEX64_or_DT_INT64_or_DT_BOOL_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -35870,6 +36866,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.logits)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -35877,7 +36876,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LogSoftmax<T>
+pub struct LogSoftmax<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -35955,6 +36954,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -35962,7 +36964,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct InvertPermutation<T>
+pub struct InvertPermutation<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -36042,7 +37044,7 @@ impl GraphOperation for TensorArrayClose {
 }
 
 #[derive(Clone)]
-struct TensorArrayClose {
+pub struct TensorArrayClose {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -36103,6 +37105,9 @@ where T: TensorType,
             new_op.add_edge(&self.filter)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -36133,7 +37138,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv2D<T>
+pub struct Conv2D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -36250,6 +37255,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tshape", Tshape::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -36257,7 +37268,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Reshape<T, Tshape>
+pub struct Reshape<T, Tshape>
 where T: TensorType,
       T: Clone,
       Tshape: TensorType,
@@ -36356,6 +37367,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.iou_threshold)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -36363,7 +37377,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NonMaxSuppressionV2<T>
+pub struct NonMaxSuppressionV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_HALF,
@@ -36467,7 +37481,7 @@ impl GraphOperation for ReduceJoin {
 }
 
 #[derive(Clone)]
-struct ReduceJoin {
+pub struct ReduceJoin {
     inputs: Edge<String>,
     reduction_indices: Edge<i32>,
     keep_dims: Option<bool>,
@@ -36556,7 +37570,7 @@ impl GraphOperation for ReaderRestoreState {
 }
 
 #[derive(Clone)]
-struct ReaderRestoreState {
+pub struct ReaderRestoreState {
     reader_handle: Edge<String>,
     state: Edge<String>,
     op_name: Option<String>,
@@ -36631,6 +37645,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("batch_dim", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tlen", Tlen::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -36638,7 +37658,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ReverseSequence<T, Tlen>
+pub struct ReverseSequence<T, Tlen>
 where T: TensorType,
       T: Clone,
       Tlen: TensorType,
@@ -36739,6 +37759,9 @@ where T: TensorType,
             new_op.add_edge(&self.tensor)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("tensor_name", attr)})(&self.tensor_name)?
         }
         let op = new_op.finish()?;
@@ -36748,7 +37771,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaSend<T>
+pub struct XlaSend<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -36841,6 +37864,9 @@ where T: TensorType,
             new_op.add_edge(&self.global_step)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -36853,7 +37879,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyAdagradDA<T>
+pub struct ApplyAdagradDA<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -36963,6 +37989,9 @@ where T: TensorType,
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.axis {
                 None => new_op.set_attr_value_proto("axis", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("axis", *attr)})(&value)?,
@@ -36975,7 +38004,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Pack<T>
+pub struct Pack<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -37070,7 +38099,7 @@ impl GraphOperation for SparseReshape {
 }
 
 #[derive(Clone)]
-struct SparseReshape {
+pub struct SparseReshape {
     input_indices: Edge<i64>,
     input_shape: Edge<i64>,
     new_shape: Edge<i64>,
@@ -37161,6 +38190,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -37168,7 +38200,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArraySplitV2<T>
+pub struct TensorArraySplitV2<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -37257,6 +38289,9 @@ where T: TensorType,
             new_op.add_edge(&self.value)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -37269,7 +38304,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AssignAdd<T>
+pub struct AssignAdd<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -37387,7 +38422,7 @@ impl GraphOperation for LoadTPUEmbeddingCenteredRMSPropParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingCenteredRMSPropParameters {
+pub struct LoadTPUEmbeddingCenteredRMSPropParameters {
     parameters: Edge<f32>,
     ms: Edge<f32>,
     mom: Edge<f32>,
@@ -37492,7 +38527,7 @@ impl GraphOperation for RetrieveTPUEmbeddingRMSPropParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingRMSPropParameters {
+pub struct RetrieveTPUEmbeddingRMSPropParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -37598,6 +38633,9 @@ where dtype: TensorType,
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -37616,7 +38654,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct Variable<dtype>
+pub struct Variable<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -37737,7 +38775,7 @@ impl GraphOperation for LoadTPUEmbeddingADAMParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingADAMParametersGradAccumDebug {
+pub struct LoadTPUEmbeddingADAMParametersGradAccumDebug {
     parameters: Edge<f32>,
     momenta: Edge<f32>,
     velocities: Edge<f32>,
@@ -37831,6 +38869,9 @@ where T: TensorType,
             new_op.add_edge(&self.sparse_shape)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -37849,7 +38890,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AddManySparseToTensorsMap<T>
+pub struct AddManySparseToTensorsMap<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -37955,6 +38996,12 @@ where Tin: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("Tin", Tin::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -37962,7 +39009,7 @@ where Tin: TensorType,
 }
 
 #[derive(Clone)]
-struct LookupTableImport<Tin, Tout>
+pub struct LookupTableImport<Tin, Tout>
 where Tin: TensorType,
       Tin: Clone,
       Tout: TensorType,
@@ -38071,7 +39118,7 @@ impl GraphOperation for LoadTPUEmbeddingAdadeltaParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingAdadeltaParameters {
+pub struct LoadTPUEmbeddingAdadeltaParameters {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     updates: Edge<f32>,
@@ -38155,7 +39202,7 @@ impl GraphOperation for TPUCompilationResult {
 }
 
 #[derive(Clone)]
-struct TPUCompilationResult {
+pub struct TPUCompilationResult {
     op_name: Option<String>,
     id_: usize,
 }
@@ -38219,7 +39266,7 @@ impl GraphOperation for GcsConfigureCredentials {
 }
 
 #[derive(Clone)]
-struct GcsConfigureCredentials {
+pub struct GcsConfigureCredentials {
     json: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -38278,7 +39325,7 @@ impl GraphOperation for ReaderNumWorkUnitsCompleted {
 }
 
 #[derive(Clone)]
-struct ReaderNumWorkUnitsCompleted {
+pub struct ReaderNumWorkUnitsCompleted {
     reader_handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -38342,6 +39389,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -38349,7 +39399,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaClusterOutput<T>
+pub struct XlaClusterOutput<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -38438,6 +39488,12 @@ where T: TensorType,
             new_op.add_edge(&self.strides)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Index", Index::data_type())?;
+        }
+        {
             match self.begin_mask {
                 None => new_op.set_attr_value_proto("begin_mask", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("begin_mask", *attr)})(&value)?,
@@ -38474,7 +39530,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StridedSlice<T, Index>
+pub struct StridedSlice<T, Index>
 where T: TensorType,
       T: Clone,
       Index: TensorType,
@@ -38612,6 +39668,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("num_replicas", *attr)})(&self.num_replicas)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -38619,7 +39678,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TPUReplicatedOutput<T>
+pub struct TPUReplicatedOutput<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -38710,6 +39769,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.group_assignment)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -38717,7 +39779,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CrossReplicaSum<T>
+pub struct CrossReplicaSum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_BFLOAT16,
@@ -38821,7 +39883,7 @@ impl GraphOperation for FakeQuantWithMinMaxVarsGradient {
 }
 
 #[derive(Clone)]
-struct FakeQuantWithMinMaxVarsGradient {
+pub struct FakeQuantWithMinMaxVarsGradient {
     gradients: Edge<f32>,
     inputs: Edge<f32>,
     min: Edge<f32>,
@@ -38956,7 +40018,7 @@ impl GraphOperation for InitializeTableFromTextFile {
 }
 
 #[derive(Clone)]
-struct InitializeTableFromTextFile {
+pub struct InitializeTableFromTextFile {
     table_handle: Edge<String>,
     filename: Edge<String>,
     key_index: i64,
@@ -39038,6 +40100,9 @@ where T: TensorType,
             new_op.add_edge(&self.tensor)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("tensor_name", attr)})(&self.tensor_name)?
         }
         {
@@ -39062,7 +40127,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _Send<T>
+pub struct _Send<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -39153,6 +40218,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -39160,7 +40228,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Minimum<T>
+pub struct Minimum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16_or_DT_HALF,
@@ -39244,6 +40312,9 @@ where T: TensorType,
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         let op = new_op.finish()?;
@@ -39253,7 +40324,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ParallelConcat<T>
+pub struct ParallelConcat<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -39332,6 +40403,9 @@ where dtype: TensorType,
         };
         let mut new_op = graph.new_operation("OutfeedDequeue", &op_name)?;
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         {
@@ -39347,7 +40421,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct OutfeedDequeue<dtype>
+pub struct OutfeedDequeue<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -39448,7 +40522,7 @@ impl GraphOperation for RetrieveTPUEmbeddingAdagradParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingAdagradParametersGradAccumDebug {
+pub struct RetrieveTPUEmbeddingAdagradParametersGradAccumDebug {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -39557,6 +40631,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.grad)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -39564,7 +40641,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CholeskyGrad<T>
+pub struct CholeskyGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -39645,6 +40722,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -39652,7 +40732,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Atanh<T>
+pub struct Atanh<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -39734,6 +40814,9 @@ where T: TensorType,
             new_op.add_edge(&self.group_assignment)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("concat_dimension", *attr)})(&self.concat_dimension)?
         }
         {
@@ -39749,7 +40832,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AllToAll<T>
+pub struct AllToAll<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_BFLOAT16,
@@ -39849,6 +40932,9 @@ where T: TensorType,
             new_op.add_edge(&self.params)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.rnn_mode {
                 None => new_op.set_attr_value_proto("rnn_mode", &vec![18_u8, 4_u8, 108_u8, 115_u8, 116_u8, 109_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("rnn_mode", attr)})(&value)?,
@@ -39897,7 +40983,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CudnnRNNV2<T>
+pub struct CudnnRNNV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -40120,7 +41206,7 @@ impl GraphOperation for TPUReplicateMetadata {
 }
 
 #[derive(Clone)]
-struct TPUReplicateMetadata {
+pub struct TPUReplicateMetadata {
     num_replicas: i64,
     num_cores_per_replica: Option<i64>,
     topology: Option<String>,
@@ -40254,7 +41340,7 @@ impl GraphOperation for LoadTPUEmbeddingFTRLParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingFTRLParametersGradAccumDebug {
+pub struct LoadTPUEmbeddingFTRLParametersGradAccumDebug {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     linears: Edge<f32>,
@@ -40341,6 +41427,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.ref_)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -40348,7 +41437,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct IsVariableInitialized<dtype>
+pub struct IsVariableInitialized<dtype>
 where dtype: TensorType,
       dtype: Clone,
       dtype: 'static,
@@ -40449,6 +41538,9 @@ where T: TensorType,
             };
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.round_mode {
                 None => new_op.set_attr_value_proto("round_mode", &vec![18_u8, 12_u8, 72_u8, 65_u8, 76_u8, 70_u8, 95_u8, 84_u8, 79_u8, 95_u8, 69_u8, 86_u8, 69_u8, 78_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("round_mode", attr)})(&value)?,
@@ -40461,7 +41553,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizeAndDequantizeV2<T>
+pub struct QuantizeAndDequantizeV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -40590,6 +41682,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.paddings)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tblock_shape", Tblock_shape::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tpaddings", Tpaddings::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -40597,7 +41698,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SpaceToBatchND<T, Tblock_shape, Tpaddings>
+pub struct SpaceToBatchND<T, Tblock_shape, Tpaddings>
 where T: TensorType,
       T: Clone,
       Tblock_shape: TensorType,
@@ -40712,6 +41813,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.seed)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tseed", Tseed::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -40719,7 +41829,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StatelessRandomUniform<T, Tseed, dtype>
+pub struct StatelessRandomUniform<T, Tseed, dtype>
 where T: TensorType,
       T: Clone,
       Tseed: TensorType,
@@ -40819,6 +41929,9 @@ where dtype: TensorType,
         };
         let mut new_op = graph.new_operation("InfeedDequeue", &op_name)?;
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         let op = new_op.finish()?;
@@ -40828,7 +41941,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct InfeedDequeue<dtype>
+pub struct InfeedDequeue<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -40904,6 +42017,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -40911,7 +42027,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct IsFinite<T>
+pub struct IsFinite<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -40988,6 +42104,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -40995,7 +42114,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct GuaranteeConst<T>
+pub struct GuaranteeConst<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -41077,6 +42196,12 @@ where Tparams: TensorType,
         {
             new_op.add_edge(&self.indices)?
         }
+        {
+            new_op.set_attr_type("Tparams", Tparams::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -41084,7 +42209,7 @@ where Tparams: TensorType,
 }
 
 #[derive(Clone)]
-struct GatherNd<Tparams, Tindices>
+pub struct GatherNd<Tparams, Tindices>
 where Tparams: TensorType,
       Tparams: Clone,
       Tindices: TensorType,
@@ -41177,6 +42302,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_idx", out_idx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -41184,7 +42315,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UniqueWithCounts<T, out_idx>
+pub struct UniqueWithCounts<T, out_idx>
 where T: TensorType,
       T: Clone,
       out_idx: TensorType,
@@ -41299,6 +42430,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_idx", out_idx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -41306,7 +42443,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ListDiff<T, out_idx>
+pub struct ListDiff<T, out_idx>
 where T: TensorType,
       T: Clone,
       out_idx: TensorType,
@@ -41437,7 +42574,7 @@ impl GraphOperation for LoadTPUEmbeddingAdadeltaParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingAdadeltaParametersGradAccumDebug {
+pub struct LoadTPUEmbeddingAdadeltaParametersGradAccumDebug {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     updates: Edge<f32>,
@@ -41531,6 +42668,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -41538,7 +42681,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BroadcastTo<T, Tidx>
+pub struct BroadcastTo<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -41628,6 +42771,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.device_name {
                 None => new_op.set_attr_value_proto("device_name", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("device_name", attr)})(&value)?,
@@ -41676,7 +42822,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DebugNumericSummary<T>
+pub struct DebugNumericSummary<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -41814,6 +42960,9 @@ where T: TensorType,
             new_op.add_edge(&self.sparse_shape)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -41832,7 +42981,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AddSparseToTensorsMap<T>
+pub struct AddSparseToTensorsMap<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -41937,6 +43086,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -41952,7 +43104,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Dilation2DBackpropFilter<T>
+pub struct Dilation2DBackpropFilter<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -42056,6 +43208,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -42068,7 +43226,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterSub<T, Tindices>
+pub struct ScatterSub<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -42202,6 +43360,9 @@ where T: TensorType,
             new_op.add_edge(&self.reserve_space)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.rnn_mode {
                 None => new_op.set_attr_value_proto("rnn_mode", &vec![18_u8, 4_u8, 108_u8, 115_u8, 116_u8, 109_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("rnn_mode", attr)})(&value)?,
@@ -42244,7 +43405,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CudnnRNNBackprop<T>
+pub struct CudnnRNNBackprop<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -42432,6 +43593,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.shape {
                 None => new_op.set_attr_value_proto("shape", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("shape", attr)})(&value)?,
@@ -42450,7 +43614,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct InfeedEnqueue<dtype>
+pub struct InfeedEnqueue<dtype>
 where dtype: TensorType,
       dtype: Clone,
       dtype: 'static,
@@ -42542,7 +43706,7 @@ impl GraphOperation for PrintV2 {
 }
 
 #[derive(Clone)]
-struct PrintV2 {
+pub struct PrintV2 {
     input: Edge<String>,
     output_stream: Option<String>,
     op_name: Option<String>,
@@ -42624,7 +43788,7 @@ impl GraphOperation for RetrieveTPUEmbeddingFTRLParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingFTRLParameters {
+pub struct RetrieveTPUEmbeddingFTRLParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -42730,6 +43894,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.device_name {
                 None => new_op.set_attr_value_proto("device_name", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("device_name", attr)})(&value)?,
@@ -42760,7 +43927,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DebugNanCount<T>
+pub struct DebugNanCount<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -42890,6 +44057,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -42902,7 +44072,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyRMSProp<T>
+pub struct ApplyRMSProp<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -43029,7 +44199,7 @@ impl GraphOperation for FakeQuantWithMinMaxVars {
 }
 
 #[derive(Clone)]
-struct FakeQuantWithMinMaxVars {
+pub struct FakeQuantWithMinMaxVars {
     inputs: Edge<f32>,
     min: Edge<f32>,
     max: Edge<f32>,
@@ -43127,6 +44297,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dimension)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
+        {
+            new_op.set_attr_type("output_type", output_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -43134,7 +44313,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ArgMax<T, Tidx, output_type>
+pub struct ArgMax<T, Tidx, output_type>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -43270,6 +44449,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -43277,7 +44459,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FractionalMaxPool<T>
+pub struct FractionalMaxPool<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64,
@@ -43475,6 +44657,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.updates)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -43482,7 +44670,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterNdNonAliasingAdd<T, Tindices>
+pub struct ScatterNdNonAliasingAdd<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -43582,7 +44770,7 @@ impl GraphOperation for TensorArraySize {
 }
 
 #[derive(Clone)]
-struct TensorArraySize {
+pub struct TensorArraySize {
     handle: Edge<String>,
     flow_in: Edge<f32>,
     op_name: Option<String>,
@@ -43661,7 +44849,7 @@ impl GraphOperation for CTCGreedyDecoder {
 }
 
 #[derive(Clone)]
-struct CTCGreedyDecoder {
+pub struct CTCGreedyDecoder {
     inputs: Edge<f32>,
     sequence_length: Edge<i32>,
     merge_repeated: Option<bool>,
@@ -43792,7 +44980,7 @@ impl GraphOperation for LoadTPUEmbeddingMomentumParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingMomentumParameters {
+pub struct LoadTPUEmbeddingMomentumParameters {
     parameters: Edge<f32>,
     momenta: Edge<f32>,
     table_id: Option<i64>,
@@ -43882,7 +45070,7 @@ impl GraphOperation for BoostedTreesBucketize {
 }
 
 #[derive(Clone)]
-struct BoostedTreesBucketize {
+pub struct BoostedTreesBucketize {
     float_values: Edge<f32>,
     bucket_boundaries: Edge<f32>,
     num_features: i64,
@@ -43964,6 +45152,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -43976,7 +45170,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterNdAdd<T, Tindices>
+pub struct ScatterNdAdd<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -44090,6 +45284,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -44102,7 +45302,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterDiv<T, Tindices>
+pub struct ScatterDiv<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -44205,6 +45405,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -44212,7 +45415,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Atan<T>
+pub struct Atan<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -44295,7 +45498,7 @@ impl GraphOperation for EncodeWav {
 }
 
 #[derive(Clone)]
-struct EncodeWav {
+pub struct EncodeWav {
     audio: Edge<f32>,
     sample_rate: Edge<i32>,
     op_name: Option<String>,
@@ -44363,6 +45566,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.squeeze_dims {
                 None => new_op.set_attr_value_proto("squeeze_dims", &vec![10_u8, 0_u8,])?,
                 Some(ref value) => (|attrs| {new_op.set_attr_int_list("squeeze_dims", attrs)})(&value)?,
@@ -44375,7 +45581,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Squeeze<T>
+pub struct Squeeze<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -44485,7 +45691,7 @@ impl GraphOperation for LoadTPUEmbeddingADAMParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingADAMParameters {
+pub struct LoadTPUEmbeddingADAMParameters {
     parameters: Edge<f32>,
     momenta: Edge<f32>,
     velocities: Edge<f32>,
@@ -44571,6 +45777,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         let op = new_op.finish()?;
@@ -44580,7 +45789,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NcclBroadcast<T>
+pub struct NcclBroadcast<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -44665,6 +45874,9 @@ where T: TensorType,
             new_op.add_edge(&self.size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -44677,7 +45889,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ResizeArea<T>
+pub struct ResizeArea<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_HALF,
@@ -44786,7 +45998,7 @@ impl GraphOperation for NegTrain {
 }
 
 #[derive(Clone)]
-struct NegTrain {
+pub struct NegTrain {
     w_in: Edge<f32>,
     w_out: Edge<f32>,
     examples: Edge<i32>,
@@ -44865,6 +46077,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -44872,7 +46090,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Real<T, Tout>
+pub struct Real<T, Tout>
 where T: TensorType,
       T: Clone,
       Tout: TensorType,
@@ -44964,6 +46182,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -44971,7 +46192,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RealDiv<T>
+pub struct RealDiv<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -45075,7 +46296,7 @@ impl GraphOperation for LoadTPUEmbeddingAdagradParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingAdagradParameters {
+pub struct LoadTPUEmbeddingAdagradParameters {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     table_id: Option<i64>,
@@ -45185,6 +46406,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -45203,7 +46427,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyAdam<T>
+pub struct ApplyAdam<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -45324,6 +46548,9 @@ where dtype: TensorType,
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.var_name {
                 None => new_op.set_attr_value_proto("var_name", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("var_name", attr)})(&value)?,
@@ -45336,7 +46563,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TemporaryVariable<dtype>
+pub struct TemporaryVariable<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -45423,6 +46650,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.q)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -45430,7 +46660,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Zeta<T>
+pub struct Zeta<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -45514,6 +46744,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dy)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -45521,7 +46754,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ReciprocalGrad<T>
+pub struct ReciprocalGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -45619,7 +46852,7 @@ impl GraphOperation for SendTPUEmbeddingGradients {
 }
 
 #[derive(Clone)]
-struct SendTPUEmbeddingGradients {
+pub struct SendTPUEmbeddingGradients {
     inputs: Edge<f32>,
     learning_rates: Edge<f32>,
     N: i64,
@@ -45708,6 +46941,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.padding_interior)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -45715,7 +46954,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaPad<T, Tindices>
+pub struct XlaPad<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -45814,6 +47053,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -45821,7 +47063,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Neg<T>
+pub struct Neg<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -45933,6 +47175,9 @@ where T: TensorType,
             new_op.add_edge(&self.host_reserved)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.rnn_mode {
                 None => new_op.set_attr_value_proto("rnn_mode", &vec![18_u8, 4_u8, 108_u8, 115_u8, 116_u8, 109_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("rnn_mode", attr)})(&value)?,
@@ -45975,7 +47220,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CudnnRNNBackpropV2<T>
+pub struct CudnnRNNBackpropV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -46168,6 +47413,9 @@ where T: TensorType,
         {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -46175,7 +47423,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct EnsureShape<T>
+pub struct EnsureShape<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -46262,6 +47510,12 @@ where Tin: TensorType,
         {
             new_op.add_edge(&self.default_value)?
         }
+        {
+            new_op.set_attr_type("Tin", Tin::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -46269,7 +47523,7 @@ where Tin: TensorType,
 }
 
 #[derive(Clone)]
-struct LookupTableFind<Tin, Tout>
+pub struct LookupTableFind<Tin, Tout>
 where Tin: TensorType,
       Tin: Clone,
       Tout: TensorType,
@@ -46340,6 +47594,7 @@ where Tin: TensorType,
 
 impl<dtype> GraphOperation for SparseConditionalAccumulator<dtype>
 where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
+      dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
 {
@@ -46356,6 +47611,9 @@ where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or
             None => graph.new_op_name("SparseConditionalAccumulator_{}")?
         };
         let mut new_op = graph.new_operation("SparseConditionalAccumulator", &op_name)?;
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
@@ -46384,8 +47642,9 @@ where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or
 }
 
 #[derive(Clone)]
-struct SparseConditionalAccumulator<dtype>
+pub struct SparseConditionalAccumulator<dtype>
 where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
+      dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
 {
@@ -46400,6 +47659,7 @@ where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or
 
 impl<dtype> SparseConditionalAccumulator<dtype>
 where dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
+      dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
 {
@@ -46513,7 +47773,7 @@ impl GraphOperation for Mfcc {
 }
 
 #[derive(Clone)]
-struct Mfcc {
+pub struct Mfcc {
     spectrogram: Edge<f32>,
     sample_rate: Edge<i32>,
     upper_frequency_limit: Option<f32>,
@@ -46592,7 +47852,8 @@ impl Mfcc {
 }
 
 impl<component_types> GraphOperation for PriorityQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     fn get_id(&self) -> usize {
@@ -46608,6 +47869,9 @@ where component_types: 'static,
             None => graph.new_op_name("PriorityQueue_{}")?
         };
         let mut new_op = graph.new_operation("PriorityQueue", &op_name)?;
+        {
+            new_op.set_attr_type("component_types", component_types::data_type())?;
+        }
         {
             (|attrs| {new_op.set_attr_shape_list("shapes", attrs)})(&self.shapes)?
         }
@@ -46636,8 +47900,9 @@ where component_types: 'static,
 }
 
 #[derive(Clone)]
-struct PriorityQueue<component_types>
-where component_types: 'static,
+pub struct PriorityQueue<component_types>
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     phantom_component_types: PhantomData<component_types>,
@@ -46650,7 +47915,8 @@ where component_types: 'static,
 }
 
 impl<component_types> PriorityQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -46734,6 +48000,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -46741,7 +48010,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Reciprocal<T>
+pub struct Reciprocal<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -46824,6 +48093,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_upper)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -46831,7 +48103,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixBandPart<T>
+pub struct BatchMatrixBandPart<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -46915,7 +48187,7 @@ impl GraphOperation for _InitializeHostForDistributedTPU {
 }
 
 #[derive(Clone)]
-struct _InitializeHostForDistributedTPU {
+pub struct _InitializeHostForDistributedTPU {
     input: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -47000,7 +48272,7 @@ impl GraphOperation for ComputeAccidentalHits {
 }
 
 #[derive(Clone)]
-struct ComputeAccidentalHits {
+pub struct ComputeAccidentalHits {
     true_classes: Edge<i64>,
     sampled_candidates: Edge<i64>,
     num_true: i64,
@@ -47132,6 +48404,12 @@ where T: TensorType,
             new_op.add_edge(&self.feature_group_count)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("dimension_numbers", attr)})(&self.dimension_numbers)?
         }
         {
@@ -47144,7 +48422,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaConv<T, Tindices>
+pub struct XlaConv<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -47274,7 +48552,7 @@ impl GraphOperation for RetrieveTPUEmbeddingMomentumParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingMomentumParameters {
+pub struct RetrieveTPUEmbeddingMomentumParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -47367,6 +48645,9 @@ where dtype: TensorType,
         };
         let mut new_op = graph.new_operation("PlaceholderV2", &op_name)?;
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         let op = new_op.finish()?;
@@ -47376,7 +48657,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct PlaceholderV2<dtype>
+pub struct PlaceholderV2<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -47451,6 +48732,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.diagonal)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -47458,7 +48742,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixDiag<T>
+pub struct BatchMatrixDiag<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -47563,7 +48847,7 @@ impl GraphOperation for FakeQuantWithMinMaxArgsGradient {
 }
 
 #[derive(Clone)]
-struct FakeQuantWithMinMaxArgsGradient {
+pub struct FakeQuantWithMinMaxArgsGradient {
     gradients: Edge<f32>,
     inputs: Edge<f32>,
     min: Option<f32>,
@@ -47668,6 +48952,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.v)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -47675,7 +48962,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct InplaceUpdate<T>
+pub struct InplaceUpdate<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -47757,6 +49044,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -47764,7 +49054,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Sigmoid<T>
+pub struct Sigmoid<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -47850,7 +49140,7 @@ impl GraphOperation for TensorArrayGrad {
 }
 
 #[derive(Clone)]
-struct TensorArrayGrad {
+pub struct TensorArrayGrad {
     handle: Edge<String>,
     flow_in: Edge<f32>,
     source: String,
@@ -47927,6 +49217,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("full_matrices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -47934,7 +49227,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Qr<T>
+pub struct Qr<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -48046,7 +49339,7 @@ impl GraphOperation for AudioSummary {
 }
 
 #[derive(Clone)]
-struct AudioSummary {
+pub struct AudioSummary {
     tag: Edge<String>,
     tensor: Edge<f32>,
     sample_rate: f32,
@@ -48128,6 +49421,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.source_target_pairs)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -48135,7 +49431,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CollectivePermute<T>
+pub struct CollectivePermute<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -48225,6 +49521,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -48232,7 +49531,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conj<T>
+pub struct Conj<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_COMPLEX64_or_DT_COMPLEX128_or_DT_VARIANT,
@@ -48327,7 +49626,7 @@ impl GraphOperation for RetrieveTPUEmbeddingAdadeltaParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingAdadeltaParameters {
+pub struct RetrieveTPUEmbeddingAdadeltaParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -48450,7 +49749,7 @@ impl GraphOperation for ConfigureDistributedTPU {
 }
 
 #[derive(Clone)]
-struct ConfigureDistributedTPU {
+pub struct ConfigureDistributedTPU {
     embedding_config: Option<String>,
     tpu_embedding_config: Option<String>,
     is_global_init: Option<bool>,
@@ -48547,7 +49846,7 @@ impl GraphOperation for BoostedTreesMakeQuantileSummaries {
 }
 
 #[derive(Clone)]
-struct BoostedTreesMakeQuantileSummaries {
+pub struct BoostedTreesMakeQuantileSummaries {
     float_values: Edge<f32>,
     example_weights: Edge<f32>,
     epsilon: Edge<f32>,
@@ -48635,7 +49934,7 @@ impl GraphOperation for NonMaxSuppression {
 }
 
 #[derive(Clone)]
-struct NonMaxSuppression {
+pub struct NonMaxSuppression {
     boxes: Edge<f32>,
     scores: Edge<f32>,
     max_output_size: Edge<i32>,
@@ -48740,7 +50039,7 @@ impl GraphOperation for LoadTPUEmbeddingAdagradParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingAdagradParametersGradAccumDebug {
+pub struct LoadTPUEmbeddingAdagradParametersGradAccumDebug {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     gradient_accumulators: Edge<f32>,
@@ -48842,7 +50141,7 @@ impl GraphOperation for RetrieveTPUEmbeddingFTRLParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingFTRLParametersGradAccumDebug {
+pub struct RetrieveTPUEmbeddingFTRLParametersGradAccumDebug {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -48960,7 +50259,7 @@ impl GraphOperation for BatchFFT {
 }
 
 #[derive(Clone)]
-struct BatchFFT {
+pub struct BatchFFT {
     input: Edge<OtherComplex<f32>>,
     op_name: Option<String>,
     id_: usize,
@@ -49051,7 +50350,7 @@ impl GraphOperation for LoadTPUEmbeddingMomentumParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingMomentumParametersGradAccumDebug {
+pub struct LoadTPUEmbeddingMomentumParametersGradAccumDebug {
     parameters: Edge<f32>,
     momenta: Edge<f32>,
     gradient_accumulators: Edge<f32>,
@@ -49135,6 +50434,9 @@ where dtype: TensorType,
         {
             (|attr: &Rc<AnyTensor>| {new_op.set_attr_tensor_owned("value", attr.clone())})(&self.value)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -49142,7 +50444,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct HostConst<dtype>
+pub struct HostConst<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -49177,24 +50479,26 @@ where dtype: TensorType,
         }
     }
 
-    pub fn build<value_T>(value: value_T) -> Self
-    where value_T: AnyTensor,
+    pub fn build<value_T, value_TensorType>(value: value_T) -> Self
+    where Tensor<value_TensorType>: From<value_T>,
           value_T: 'static,
+          value_TensorType: TensorType,
     {
         Self {
-            value: Rc::new(value),
+            value: Rc::new(Tensor::<value_TensorType>::from(value)),
             phantom_dtype: PhantomData,
             op_name: None,
             id_: new_id(),
         }
     }
 
-    pub fn new<value_T>(value: value_T) -> Edge<dtype>
-    where value_T: AnyTensor,
+    pub fn new<value_T, value_TensorType>(value: value_T) -> Edge<dtype>
+    where Tensor<value_TensorType>: From<value_T>,
           value_T: 'static,
+          value_TensorType: TensorType,
     {
         Self {
-            value: Rc::new(value),
+            value: Rc::new(Tensor::<value_TensorType>::from(value)),
             phantom_dtype: PhantomData,
             op_name: None,
             id_: new_id(),
@@ -49237,6 +50541,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -49244,7 +50554,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Sum<T, Tidx>
+pub struct Sum<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -49367,6 +50677,12 @@ where T: TensorType,
             new_op.add_edge(&self.reserve_space_2)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("U", U::data_type())?;
+        }
+        {
             match self.epsilon {
                 None => new_op.set_attr_value_proto("epsilon", &vec![37_u8, 23_u8, 183_u8, 209_u8, 56_u8,])?,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("epsilon", *attr)})(&value)?,
@@ -49391,7 +50707,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FusedBatchNormGradV2<T, U>
+pub struct FusedBatchNormGradV2<T, U>
 where T: TensorType,
       T: Clone,
       U: TensorType,
@@ -49537,7 +50853,8 @@ where T: TensorType,
 }
 
 impl<elem_type> GraphOperation for Stack<elem_type>
-where elem_type: 'static,
+where elem_type: TensorType,
+      elem_type: 'static,
       elem_type: Clone,
 {
     fn get_id(&self) -> usize {
@@ -49554,6 +50871,9 @@ where elem_type: 'static,
         };
         let mut new_op = graph.new_operation("Stack", &op_name)?;
         {
+            new_op.set_attr_type("elem_type", elem_type::data_type())?;
+        }
+        {
             match self.stack_name {
                 None => new_op.set_attr_value_proto("stack_name", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("stack_name", attr)})(&value)?,
@@ -49566,8 +50886,9 @@ where elem_type: 'static,
 }
 
 #[derive(Clone)]
-struct Stack<elem_type>
-where elem_type: 'static,
+pub struct Stack<elem_type>
+where elem_type: TensorType,
+      elem_type: 'static,
       elem_type: Clone,
 {
     phantom_elem_type: PhantomData<elem_type>,
@@ -49577,7 +50898,8 @@ where elem_type: 'static,
 }
 
 impl<elem_type> Stack<elem_type>
-where elem_type: 'static,
+where elem_type: TensorType,
+      elem_type: 'static,
       elem_type: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -49663,6 +50985,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -49670,7 +50995,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Xlogy<T>
+pub struct Xlogy<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128_or_DT_HALF,
@@ -49771,6 +51096,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("normalize", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -49778,7 +51106,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct EditDistance<T>
+pub struct EditDistance<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -49879,7 +51207,7 @@ impl GraphOperation for AccumulatorNumAccumulated {
 }
 
 #[derive(Clone)]
-struct AccumulatorNumAccumulated {
+pub struct AccumulatorNumAccumulated {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -49974,6 +51302,12 @@ where TI: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("axis", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("TI", TI::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -49981,7 +51315,7 @@ where TI: TensorType,
 }
 
 #[derive(Clone)]
-struct OneHot<TI, T>
+pub struct OneHot<TI, T>
 where TI: TensorType,
       TI: Clone,
       T: TensorType,
@@ -50091,6 +51425,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.perm)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tperm", Tperm::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -50098,7 +51438,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ConjugateTranspose<T, Tperm>
+pub struct ConjugateTranspose<T, Tperm>
 where T: TensorType,
       T: Clone,
       Tperm: TensorType,
@@ -50215,6 +51555,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.threshold)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -50222,7 +51565,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CompareAndBitpack<T>
+pub struct CompareAndBitpack<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BOOL_or_DT_HALF,
@@ -50320,7 +51663,7 @@ impl GraphOperation for RetrieveTPUEmbeddingAdagradParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingAdagradParameters {
+pub struct RetrieveTPUEmbeddingAdagradParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -50419,6 +51762,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("limit", *attr)})(&self.limit)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -50426,7 +51772,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CountUpTo<T>
+pub struct CountUpTo<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -50520,6 +51866,9 @@ where T: TensorType,
             new_op.add_edge(&self.biases)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_params", *attr)})(&self.num_params)?
         }
         {
@@ -50565,7 +51914,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CudnnRNNCanonicalToParams<T>
+pub struct CudnnRNNCanonicalToParams<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -50737,6 +52086,12 @@ where Ta: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("b_is_sparse", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("Ta", Ta::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tb", Tb::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -50744,7 +52099,7 @@ where Ta: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseMatMul<Ta, Tb>
+pub struct SparseMatMul<Ta, Tb>
 where Ta: TensorType,
       Ta: Clone,
       Tb: TensorType,
@@ -50879,7 +52234,7 @@ impl GraphOperation for TPUEmbeddingActivations {
 }
 
 #[derive(Clone)]
-struct TPUEmbeddingActivations {
+pub struct TPUEmbeddingActivations {
     embedding_variable: Edge<f32>,
     sliced_activations: Edge<f32>,
     table_id: i64,
@@ -50958,6 +52313,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.v)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -50965,7 +52323,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct InplaceSub<T>
+pub struct InplaceSub<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -51073,7 +52431,7 @@ impl GraphOperation for LoadTPUEmbeddingRMSPropParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingRMSPropParameters {
+pub struct LoadTPUEmbeddingRMSPropParameters {
     parameters: Edge<f32>,
     ms: Edge<f32>,
     mom: Edge<f32>,
@@ -51158,6 +52516,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.tensor_name {
                 None => new_op.set_attr_value_proto("tensor_name", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("tensor_name", attr)})(&value)?,
@@ -51176,7 +52537,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Copy<T>
+pub struct Copy<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -51284,6 +52645,12 @@ where Index: TensorType,
             new_op.add_edge(&self.dy)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Index", Index::data_type())?;
+        }
+        {
             match self.begin_mask {
                 None => new_op.set_attr_value_proto("begin_mask", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("begin_mask", *attr)})(&value)?,
@@ -51320,7 +52687,7 @@ where Index: TensorType,
 }
 
 #[derive(Clone)]
-struct StridedSliceGrad<Index, T>
+pub struct StridedSliceGrad<Index, T>
 where Index: TensorType,
       Index: Clone,
       T: TensorType,
@@ -51462,6 +52829,9 @@ where Tidx: TensorType,
         {
             new_op.add_edge(&self.dims)?
         }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -51469,7 +52839,7 @@ where Tidx: TensorType,
 }
 
 #[derive(Clone)]
-struct UnravelIndex<Tidx>
+pub struct UnravelIndex<Tidx>
 where Tidx: TensorType,
       Tidx: Clone,
       Tidx: con_or_DT_INT32_or_DT_INT64,
@@ -51559,6 +52929,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.updates)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -51566,7 +52942,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorScatterUpdate<T, Tindices>
+pub struct TensorScatterUpdate<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -51685,7 +53061,7 @@ impl GraphOperation for Rpc {
 }
 
 #[derive(Clone)]
-struct Rpc {
+pub struct Rpc {
     address: Edge<String>,
     method: Edge<String>,
     request: Edge<String>,
@@ -51783,6 +53159,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -51790,7 +53169,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScalarSummary<T>
+pub struct ScalarSummary<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -51874,6 +53253,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dy)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -51881,7 +53263,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TanhGrad<T>
+pub struct TanhGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -51979,7 +53361,7 @@ impl GraphOperation for RetrieveTPUEmbeddingADAMParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingADAMParameters {
+pub struct RetrieveTPUEmbeddingADAMParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -52090,6 +53472,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -52097,7 +53482,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Concat<T>
+pub struct Concat<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -52190,7 +53575,7 @@ impl GraphOperation for _WaitForDistributedTPU {
 }
 
 #[derive(Clone)]
-struct _WaitForDistributedTPU {
+pub struct _WaitForDistributedTPU {
     inputs: Edge<i32>,
     startup_timeout_sec: Option<i64>,
     N: i64,
@@ -52308,6 +53693,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.mkl_y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -52315,7 +53703,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _MklAdd<T>
+pub struct _MklAdd<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_COMPLEX64_or_DT_INT64_or_DT_COMPLEX128_or_DT_HALF,
@@ -52437,7 +53825,7 @@ impl GraphOperation for AllCandidateSampler {
 }
 
 #[derive(Clone)]
-struct AllCandidateSampler {
+pub struct AllCandidateSampler {
     true_classes: Edge<i64>,
     num_true: i64,
     num_sampled: i64,
@@ -52590,7 +53978,7 @@ impl GraphOperation for DecodeAndCropJpeg {
 }
 
 #[derive(Clone)]
-struct DecodeAndCropJpeg {
+pub struct DecodeAndCropJpeg {
     contents: Edge<String>,
     crop_window: Edge<i32>,
     channels: Option<i64>,
@@ -52703,6 +54091,9 @@ where tensor_type: TensorType,
         };
         let mut new_op = graph.new_operation("_Recv", &op_name)?;
         {
+            new_op.set_attr_type("tensor_type", tensor_type::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("tensor_name", attr)})(&self.tensor_name)?
         }
         {
@@ -52727,7 +54118,7 @@ where tensor_type: TensorType,
 }
 
 #[derive(Clone)]
-struct _Recv<tensor_type>
+pub struct _Recv<tensor_type>
 where tensor_type: TensorType,
       tensor_type: 'static,
       tensor_type: Clone,
@@ -52822,7 +54213,7 @@ impl GraphOperation for SdcaFprint {
 }
 
 #[derive(Clone)]
-struct SdcaFprint {
+pub struct SdcaFprint {
     input: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -52895,7 +54286,7 @@ impl GraphOperation for ReaderReadUpTo {
 }
 
 #[derive(Clone)]
-struct ReaderReadUpTo {
+pub struct ReaderReadUpTo {
     reader_handle: Edge<String>,
     queue_handle: Edge<String>,
     num_records: Edge<i64>,
@@ -52981,6 +54372,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -52988,7 +54385,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Shape<T, out_type>
+pub struct Shape<T, out_type>
 where T: TensorType,
       T: Clone,
       out_type: TensorType,
@@ -53078,6 +54475,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -53085,7 +54485,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Pow<T>
+pub struct Pow<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -53173,6 +54573,9 @@ where T: TensorType,
             new_op.add_edge(&self.max_range)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.mode {
                 None => new_op.set_attr_value_proto("mode", &vec![18_u8, 12_u8, 77_u8, 73_u8, 78_u8, 95_u8, 67_u8, 79_u8, 77_u8, 66_u8, 73_u8, 78_u8, 69_u8, 68_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("mode", attr)})(&value)?,
@@ -53191,7 +54594,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizeV2<T>
+pub struct QuantizeV2<T>
 where T: TensorType,
       T: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
       T: 'static,
@@ -53318,6 +54721,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("num_split", *attr)})(&self.num_split)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -53325,7 +54731,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Split<T>
+pub struct Split<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -53414,6 +54820,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.imag)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -53421,7 +54833,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Complex<T, Tout>
+pub struct Complex<T, Tout>
 where T: TensorType,
       T: Clone,
       Tout: TensorType,
@@ -53517,6 +54929,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -53524,7 +54942,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Imag<T, Tout>
+pub struct Imag<T, Tout>
 where T: TensorType,
       T: Clone,
       Tout: TensorType,
@@ -53630,6 +55048,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_segments)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tnumsegments", Tnumsegments::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -53637,7 +55064,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentSumWithNumSegments<T, Tidx, Tnumsegments>
+pub struct SparseSegmentSumWithNumSegments<T, Tidx, Tnumsegments>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -53746,6 +55173,9 @@ where T: TensorType,
             new_op.add_edge(&self.inputs)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
         let op = new_op.finish()?;
@@ -53755,7 +55185,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Merge<T>
+pub struct Merge<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -53852,6 +55282,12 @@ where index_type: TensorType,
         {
             new_op.add_edge(&self.value)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("index_type", index_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -53859,7 +55295,7 @@ where index_type: TensorType,
 }
 
 #[derive(Clone)]
-struct Fill<index_type, T>
+pub struct Fill<index_type, T>
 where index_type: TensorType,
       index_type: Clone,
       T: TensorType,
@@ -53958,6 +55394,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.updates)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -53965,7 +55407,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorScatterSub<T, Tindices>
+pub struct TensorScatterSub<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -54057,6 +55499,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.diagonal)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -54064,7 +55509,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixDiag<T>
+pub struct MatrixDiag<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -54143,6 +55588,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -54150,7 +55598,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FloorDiv<T>
+pub struct FloorDiv<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -54235,6 +55683,9 @@ where T: TensorType,
             new_op.add_edge(&self.init_value)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("dimensions_to_reduce", attrs)})(&self.dimensions_to_reduce)?
         }
         {
@@ -54247,7 +55698,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaReduce<T>
+pub struct XlaReduce<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -54346,6 +55797,12 @@ where Tparams: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("validate_indices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("Tparams", Tparams::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -54353,7 +55810,7 @@ where Tparams: TensorType,
 }
 
 #[derive(Clone)]
-struct Gather<Tparams, Tindices>
+pub struct Gather<Tparams, Tindices>
 where Tparams: TensorType,
       Tparams: Clone,
       Tindices: TensorType,
@@ -54464,6 +55921,15 @@ where Tparams: TensorType,
         {
             new_op.add_edge(&self.axis)?
         }
+        {
+            new_op.set_attr_type("Tparams", Tparams::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Taxis", Taxis::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -54471,7 +55937,7 @@ where Tparams: TensorType,
 }
 
 #[derive(Clone)]
-struct GatherV2<Tparams, Tindices, Taxis>
+pub struct GatherV2<Tparams, Tindices, Taxis>
 where Tparams: TensorType,
       Tparams: Clone,
       Tindices: TensorType,
@@ -54595,7 +56061,7 @@ impl GraphOperation for UnicodeEncode {
 }
 
 #[derive(Clone)]
-struct UnicodeEncode {
+pub struct UnicodeEncode {
     input_values: Edge<i32>,
     input_splits: Edge<i64>,
     errors: Option<String>,
@@ -54682,6 +56148,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -54689,7 +56158,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Erfc<T>
+pub struct Erfc<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -54767,6 +56236,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -54774,7 +56246,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DiagPart<T>
+pub struct DiagPart<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -54859,6 +56331,9 @@ where T: TensorType,
             new_op.add_edge(&self.x_max)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.output_range_given {
                 None => new_op.set_attr_value_proto("output_range_given", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("output_range_given", *attr)})(&value)?,
@@ -54895,7 +56370,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedInstanceNorm<T>
+pub struct QuantizedInstanceNorm<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
@@ -55040,6 +56515,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -55047,7 +56525,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RefIdentity<T>
+pub struct RefIdentity<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -55122,6 +56600,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -55129,7 +56610,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StopGradient<T>
+pub struct StopGradient<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -55205,6 +56686,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -55212,7 +56696,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Asin<T>
+pub struct Asin<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -55290,6 +56774,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.message {
                 None => new_op.set_attr_value_proto("message", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("message", attr)})(&value)?,
@@ -55302,7 +56789,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct PreventGradient<T>
+pub struct PreventGradient<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -55395,6 +56882,12 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -55402,7 +56895,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ConcatV2<T, Tidx>
+pub struct ConcatV2<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -55497,7 +56990,7 @@ impl GraphOperation for ReadFile {
 }
 
 #[derive(Clone)]
-struct ReadFile {
+pub struct ReadFile {
     filename: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -55562,6 +57055,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         let op = new_op.finish()?;
@@ -55571,7 +57067,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct PlaceholderWithDefault<dtype>
+pub struct PlaceholderWithDefault<dtype>
 where dtype: TensorType,
       dtype: Clone,
       dtype: 'static,
@@ -55642,6 +57138,7 @@ where T1: TensorType,
       Toutput: 'static,
       Toutput: Clone,
       Tactivation: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
+      Tactivation: TensorType,
       Tactivation: 'static,
       Tactivation: Clone,
 {
@@ -55677,6 +57174,15 @@ where T1: TensorType,
             new_op.add_edge(&self.max_b)?
         }
         {
+            new_op.set_attr_type("T1", T1::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T2", T2::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Toutput", Toutput::data_type())?;
+        }
+        {
             match self.transpose_a {
                 None => new_op.set_attr_value_proto("transpose_a", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("transpose_a", *attr)})(&value)?,
@@ -55688,6 +57194,9 @@ where T1: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("transpose_b", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("Tactivation", Tactivation::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -55695,7 +57204,7 @@ where T1: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedMatMul<T1, T2, Toutput, Tactivation>
+pub struct QuantizedMatMul<T1, T2, Toutput, Tactivation>
 where T1: TensorType,
       T1: Clone,
       T2: TensorType,
@@ -55709,6 +57218,7 @@ where T1: TensorType,
       Toutput: 'static,
       Toutput: Clone,
       Tactivation: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
+      Tactivation: TensorType,
       Tactivation: 'static,
       Tactivation: Clone,
 {
@@ -55742,6 +57252,7 @@ where T1: TensorType,
       Toutput: 'static,
       Toutput: Clone,
       Tactivation: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
+      Tactivation: TensorType,
       Tactivation: 'static,
       Tactivation: Clone,
 {
@@ -55859,6 +57370,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.diagonal)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -55866,7 +57380,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixSetDiag<T>
+pub struct BatchMatrixSetDiag<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -55942,6 +57456,9 @@ where dtype: TensorType,
         };
         let mut new_op = graph.new_operation("XlaRecv", &op_name)?;
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("tensor_name", attr)})(&self.tensor_name)?
         }
         {
@@ -55954,7 +57471,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaRecv<dtype>
+pub struct XlaRecv<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -56043,6 +57560,9 @@ where T: TensorType,
             (|attrs| {new_op.set_attr_int_list("rates", attrs)})(&self.rates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("padding", attr)})(&self.padding)?
         }
         let op = new_op.finish()?;
@@ -56052,7 +57572,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ExtractImagePatches<T>
+pub struct ExtractImagePatches<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -56152,6 +57672,9 @@ where T: TensorType,
             new_op.add_edge(&self.params)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_params", *attr)})(&self.num_params)?
         }
         {
@@ -56197,7 +57720,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CudnnRNNParamsToCanonical<T>
+pub struct CudnnRNNParamsToCanonical<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -56353,6 +57876,12 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -56360,7 +57889,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ShapeN<T, out_type>
+pub struct ShapeN<T, out_type>
 where T: TensorType,
       T: Clone,
       out_type: TensorType,
@@ -56449,6 +57978,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -56456,7 +57988,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Rank<T>
+pub struct Rank<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -56535,6 +58067,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -56542,7 +58080,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Size<T, out_type>
+pub struct Size<T, out_type>
 where T: TensorType,
       T: Clone,
       out_type: TensorType,
@@ -56628,7 +58166,7 @@ impl GraphOperation for _DisconnectHostFromDistributedTPUSystem {
 }
 
 #[derive(Clone)]
-struct _DisconnectHostFromDistributedTPUSystem {
+pub struct _DisconnectHostFromDistributedTPUSystem {
     op_name: Option<String>,
     id_: usize,
 }
@@ -56699,6 +58237,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.size)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Index", Index::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -56706,7 +58250,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Slice<T, Index>
+pub struct Slice<T, Index>
 where T: TensorType,
       T: Clone,
       Index: TensorType,
@@ -56819,6 +58363,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("shared_name", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -56826,7 +58373,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Unbatch<T>
+pub struct Unbatch<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -56939,6 +58486,12 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("num_split", *attr)})(&self.num_split)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tlen", Tlen::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -56946,7 +58499,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SplitV<T, Tlen>
+pub struct SplitV<T, Tlen>
 where T: TensorType,
       T: Clone,
       Tlen: TensorType,
@@ -57058,6 +58611,12 @@ where T: TensorType,
             new_op.add_edge(&self.value)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Index", Index::data_type())?;
+        }
+        {
             match self.begin_mask {
                 None => new_op.set_attr_value_proto("begin_mask", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("begin_mask", *attr)})(&value)?,
@@ -57094,7 +58653,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct StridedSliceAssign<T, Index>
+pub struct StridedSliceAssign<T, Index>
 where T: TensorType,
       T: Clone,
       Index: TensorType,
@@ -57241,6 +58800,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -57248,7 +58810,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayWrite<T>
+pub struct TensorArrayWrite<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -57335,6 +58897,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.multiples)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -57342,7 +58907,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TileGrad<T>
+pub struct TileGrad<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -57432,7 +58997,7 @@ impl GraphOperation for StringJoin {
 }
 
 #[derive(Clone)]
-struct StringJoin {
+pub struct StringJoin {
     inputs: Edge<String>,
     N: i64,
     separator: Option<String>,
@@ -57505,6 +59070,9 @@ where dtype: TensorType,
         };
         let mut new_op = graph.new_operation("ImmutableConst", &op_name)?;
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         {
@@ -57517,7 +59085,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct ImmutableConst<dtype>
+pub struct ImmutableConst<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -57611,6 +59179,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.b_shape)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -57618,7 +59189,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSparseMaximum<T>
+pub struct SparseSparseMaximum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -57725,6 +59296,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.diagonal)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -57732,7 +59306,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixSetDiag<T>
+pub struct MatrixSetDiag<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -57819,7 +59393,7 @@ impl GraphOperation for EncodeBase64 {
 }
 
 #[derive(Clone)]
-struct EncodeBase64 {
+pub struct EncodeBase64 {
     input: Edge<String>,
     pad: Option<bool>,
     op_name: Option<String>,
@@ -57894,7 +59468,7 @@ impl GraphOperation for TensorArrayCloseV2 {
 }
 
 #[derive(Clone)]
-struct TensorArrayCloseV2 {
+pub struct TensorArrayCloseV2 {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -57955,6 +59529,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("output_idx_type", output_idx_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -57962,7 +59542,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Lu<T, output_idx_type>
+pub struct Lu<T, output_idx_type>
 where T: TensorType,
       T: Clone,
       output_idx_type: TensorType,
@@ -58066,6 +59646,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.s1)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -58073,7 +59656,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BroadcastGradientArgs<T>
+pub struct BroadcastGradientArgs<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -58189,6 +59772,12 @@ where T: TensorType,
             new_op.add_edge(&self.indices)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -58201,7 +59790,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyProximalAdagrad<T, Tindices>
+pub struct SparseApplyProximalAdagrad<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -58328,6 +59917,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input_max)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tshape", Tshape::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -58335,7 +59930,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedReshape<T, Tshape>
+pub struct QuantizedReshape<T, Tshape>
 where T: TensorType,
       T: Clone,
       Tshape: TensorType,
@@ -58466,6 +60061,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.output_dim0)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -58473,7 +60074,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentSqrtNGrad<T, Tidx>
+pub struct SparseSegmentSqrtNGrad<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -58577,6 +60178,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.paddings)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tpaddings", Tpaddings::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -58584,7 +60191,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Pad<T, Tpaddings>
+pub struct Pad<T, Tpaddings>
 where T: TensorType,
       T: Clone,
       Tpaddings: TensorType,
@@ -58677,6 +60284,9 @@ where T: TensorType,
             new_op.add_edge(&self.update)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("loc", *attr)})(&self.loc)?
         }
         let op = new_op.finish()?;
@@ -58686,7 +60296,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _ParallelConcatUpdate<T>
+pub struct _ParallelConcatUpdate<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -58768,6 +60378,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -58775,7 +60388,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Digamma<T>
+pub struct Digamma<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -58860,6 +60473,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -58890,7 +60506,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv2DBackpropFilter<T>
+pub struct Conv2DBackpropFilter<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -59001,6 +60617,9 @@ where dtype: TensorType,
         };
         let mut new_op = graph.new_operation("Placeholder", &op_name)?;
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.shape {
                 None => new_op.set_attr_value_proto("shape", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("shape", attr)})(&value)?,
@@ -59013,7 +60632,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct Placeholder<dtype>
+pub struct Placeholder<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -59105,6 +60724,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.size)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -59112,7 +60734,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSlice<T>
+pub struct SparseSlice<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -59233,6 +60855,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -59240,7 +60865,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedConcat<T>
+pub struct QuantizedConcat<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -59357,6 +60982,12 @@ where T: TensorType,
             new_op.add_edge(&self.paddings)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tpaddings", Tpaddings::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("block_size", *attr)})(&self.block_size)?
         }
         let op = new_op.finish()?;
@@ -59366,7 +60997,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SpaceToBatch<T, Tpaddings>
+pub struct SpaceToBatch<T, Tpaddings>
 where T: TensorType,
       T: Clone,
       Tpaddings: TensorType,
@@ -59461,7 +61092,7 @@ impl GraphOperation for DecodeGif {
 }
 
 #[derive(Clone)]
-struct DecodeGif {
+pub struct DecodeGif {
     contents: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -59529,6 +61160,9 @@ where T: TensorType,
             (|attr: &i64| {new_op.set_attr_int("num", *attr)})(&self.num)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.axis {
                 None => new_op.set_attr_value_proto("axis", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("axis", *attr)})(&value)?,
@@ -59541,7 +61175,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Unpack<T>
+pub struct Unpack<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -59641,6 +61275,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.crops)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tblock_shape", Tblock_shape::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tcrops", Tcrops::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -59648,7 +61291,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchToSpaceND<T, Tblock_shape, Tcrops>
+pub struct BatchToSpaceND<T, Tblock_shape, Tcrops>
 where T: TensorType,
       T: Clone,
       Tblock_shape: TensorType,
@@ -59798,6 +61441,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("type_", type_::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -59805,7 +61454,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Bitcast<T, type_>
+pub struct Bitcast<T, type_>
 where T: TensorType,
       T: Clone,
       type_: TensorType,
@@ -59894,6 +61543,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -59901,7 +61553,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Where<T>
+pub struct Where<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BOOL_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -60009,6 +61661,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("input_max", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -60016,7 +61671,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizeAndDequantize<T>
+pub struct QuantizeAndDequantize<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -60193,7 +61848,7 @@ impl GraphOperation for SdcaOptimizerV2 {
 }
 
 #[derive(Clone)]
-struct SdcaOptimizerV2 {
+pub struct SdcaOptimizerV2 {
     sparse_example_indices: Edge<i64>,
     sparse_feature_indices: Edge<i64>,
     sparse_feature_values: Edge<f32>,
@@ -60339,6 +61994,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.tensor_name {
                 None => new_op.set_attr_value_proto("tensor_name", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("tensor_name", attr)})(&value)?,
@@ -60357,7 +62015,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CopyHost<T>
+pub struct CopyHost<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -60467,6 +62125,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("overlapping", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -60474,7 +62135,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FractionalMaxPoolGrad<T>
+pub struct FractionalMaxPoolGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64,
@@ -60578,6 +62239,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -60585,7 +62252,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UpperBound<T, out_type>
+pub struct UpperBound<T, out_type>
 where T: TensorType,
       T: Clone,
       out_type: TensorType,
@@ -60692,7 +62359,7 @@ impl GraphOperation for RetrieveTPUEmbeddingADAMParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingADAMParametersGradAccumDebug {
+pub struct RetrieveTPUEmbeddingADAMParametersGradAccumDebug {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -60807,6 +62474,9 @@ where dtype: TensorType,
         {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -60814,7 +62484,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct _ParallelConcatStart<dtype>
+pub struct _ParallelConcatStart<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -60896,6 +62566,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -60903,7 +62579,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LowerBound<T, out_type>
+pub struct LowerBound<T, out_type>
 where T: TensorType,
       T: Clone,
       out_type: TensorType,
@@ -60994,6 +62670,9 @@ where T: TensorType,
             new_op.add_edge(&self.tensor)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("message", attr)})(&self.message)?
         }
         let op = new_op.finish()?;
@@ -61003,7 +62682,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CheckNumerics<T>
+pub struct CheckNumerics<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -61094,6 +62773,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.axis)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Taxis", Taxis::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_idx", out_idx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -61101,7 +62789,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UniqueWithCountsV2<T, Taxis, out_idx>
+pub struct UniqueWithCountsV2<T, Taxis, out_idx>
 where T: TensorType,
       T: Clone,
       Taxis: TensorType,
@@ -61226,7 +62914,7 @@ impl GraphOperation for LookupTableSize {
 }
 
 #[derive(Clone)]
-struct LookupTableSize {
+pub struct LookupTableSize {
     table_handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -61306,6 +62994,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adjoint", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -61313,7 +63004,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixTriangularSolve<T>
+pub struct MatrixTriangularSolve<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -61418,7 +63109,7 @@ impl GraphOperation for QueueClose {
 }
 
 #[derive(Clone)]
-struct QueueClose {
+pub struct QueueClose {
     handle: Edge<String>,
     cancel_pending_enqueues: Option<bool>,
     op_name: Option<String>,
@@ -61493,6 +63184,9 @@ where T: TensorType,
             new_op.add_edge(&self.image_size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.method {
                 None => new_op.set_attr_value_proto("method", &vec![18_u8, 8_u8, 98_u8, 105_u8, 108_u8, 105_u8, 110_u8, 101_u8, 97_u8, 114_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("method", attr)})(&value)?,
@@ -61505,7 +63199,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CropAndResizeGradImage<T>
+pub struct CropAndResizeGradImage<T>
 where T: TensorType,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
       T: 'static,
@@ -61607,6 +63301,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -61614,7 +63314,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SegmentSum<T, Tindices>
+pub struct SegmentSum<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -61721,6 +63421,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adjoint", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -61728,7 +63431,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixTriangularSolve<T>
+pub struct BatchMatrixTriangularSolve<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -61851,7 +63554,7 @@ impl GraphOperation for ExtractGlimpse {
 }
 
 #[derive(Clone)]
-struct ExtractGlimpse {
+pub struct ExtractGlimpse {
     input: Edge<f32>,
     size: Edge<i32>,
     offsets: Edge<f32>,
@@ -61956,6 +63659,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.broadcast_dims)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -61963,7 +63672,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaBroadcastHelper<T, Tindices>
+pub struct XlaBroadcastHelper<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -62073,6 +63782,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dy)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -62080,7 +63792,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct InvGrad<T>
+pub struct InvGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -62140,7 +63852,8 @@ where T: TensorType,
 }
 
 impl<component_types> GraphOperation for RandomShuffleQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     fn get_id(&self) -> usize {
@@ -62156,6 +63869,9 @@ where component_types: 'static,
             None => graph.new_op_name("RandomShuffleQueue_{}")?
         };
         let mut new_op = graph.new_operation("RandomShuffleQueue", &op_name)?;
+        {
+            new_op.set_attr_type("component_types", component_types::data_type())?;
+        }
         {
             match self.shapes {
                 None => new_op.set_attr_value_proto("shapes", &vec![10_u8, 0_u8,])?,
@@ -62205,8 +63921,9 @@ where component_types: 'static,
 }
 
 #[derive(Clone)]
-struct RandomShuffleQueue<component_types>
-where component_types: 'static,
+pub struct RandomShuffleQueue<component_types>
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     phantom_component_types: PhantomData<component_types>,
@@ -62222,7 +63939,8 @@ where component_types: 'static,
 }
 
 impl<component_types> RandomShuffleQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -62361,7 +64079,7 @@ impl GraphOperation for LoadTPUEmbeddingMDLAdagradLightParameters {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingMDLAdagradLightParameters {
+pub struct LoadTPUEmbeddingMDLAdagradLightParameters {
     parameters: Edge<f32>,
     accumulators: Edge<f32>,
     weights: Edge<f32>,
@@ -62471,6 +64189,9 @@ where T: TensorType,
             new_op.add_edge(&self.size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -62483,7 +64204,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ResizeNearestNeighborGrad<T>
+pub struct ResizeNearestNeighborGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT8_or_DT_HALF,
@@ -62589,7 +64310,7 @@ impl GraphOperation for RetrieveTPUEmbeddingMomentumParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingMomentumParametersGradAccumDebug {
+pub struct RetrieveTPUEmbeddingMomentumParametersGradAccumDebug {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -62695,6 +64416,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -62702,7 +64426,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct IsNan<T>
+pub struct IsNan<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -62785,7 +64509,7 @@ impl GraphOperation for AdjustSaturation {
 }
 
 #[derive(Clone)]
-struct AdjustSaturation {
+pub struct AdjustSaturation {
     images: Edge<f32>,
     scale: Edge<f32>,
     op_name: Option<String>,
@@ -62856,6 +64580,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -62863,7 +64590,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SoftplusGrad<T>
+pub struct SoftplusGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -62950,6 +64677,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("compute_v", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -62957,7 +64687,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SelfAdjointEigV2<T>
+pub struct SelfAdjointEigV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -63055,6 +64785,9 @@ where Tcomplex: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("Tcomplex", Tcomplex::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -63062,7 +64795,7 @@ where Tcomplex: TensorType,
 }
 
 #[derive(Clone)]
-struct FFT<Tcomplex>
+pub struct FFT<Tcomplex>
 where Tcomplex: TensorType,
       Tcomplex: Clone,
       Tcomplex: con_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -63149,6 +64882,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_upper)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindex", Tindex::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -63156,7 +64895,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixBandPart<T, Tindex>
+pub struct MatrixBandPart<T, Tindex>
 where T: TensorType,
       T: Clone,
       Tindex: TensorType,
@@ -63258,6 +64997,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.updates)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -63265,7 +65010,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorScatterAdd<T, Tindices>
+pub struct TensorScatterAdd<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -63358,6 +65103,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -63365,7 +65113,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LogMatrixDeterminant<T>
+pub struct LogMatrixDeterminant<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -63491,6 +65239,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -63498,7 +65249,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AddV2<T>
+pub struct AddV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -63579,6 +65330,9 @@ where T: TensorType,
             new_op.add_edge(&self.tensor)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.description {
                 None => new_op.set_attr_value_proto("description", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("description", attr)})(&value)?,
@@ -63603,7 +65357,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorSummary<T>
+pub struct TensorSummary<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -63725,6 +65479,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -63732,7 +65492,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomUniformInt<T, Tout>
+pub struct RandomUniformInt<T, Tout>
 where T: TensorType,
       T: Clone,
       Tout: TensorType,
@@ -63844,6 +65604,9 @@ where T: TensorType,
             new_op.add_edge(&self.x)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.src_format {
                 None => new_op.set_attr_value_proto("src_format", &vec![18_u8, 4_u8, 78_u8, 72_u8, 87_u8, 67_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("src_format", attr)})(&value)?,
@@ -63862,7 +65625,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DataFormatDimMap<T>
+pub struct DataFormatDimMap<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -63959,6 +65722,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.s1)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -63966,7 +65732,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BroadcastArgs<T>
+pub struct BroadcastArgs<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_INT64,
@@ -64066,6 +65832,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("reverse", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -64073,7 +65845,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Cumsum<T, Tidx>
+pub struct Cumsum<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -64240,7 +66012,7 @@ impl GraphOperation for SdcaOptimizer {
 }
 
 #[derive(Clone)]
-struct SdcaOptimizer {
+pub struct SdcaOptimizer {
     sparse_example_indices: Edge<i64>,
     sparse_feature_indices: Edge<i64>,
     sparse_feature_values: Edge<f32>,
@@ -64397,6 +66169,12 @@ where T: TensorType,
             new_op.add_edge(&self.updates)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -64409,7 +66187,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ScatterAdd<T, Tindices>
+pub struct ScatterAdd<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -64529,7 +66307,7 @@ impl GraphOperation for TextLineReader {
 }
 
 #[derive(Clone)]
-struct TextLineReader {
+pub struct TextLineReader {
     skip_header_lines: Option<i64>,
     container: Option<String>,
     shared_name: Option<String>,
@@ -64615,6 +66393,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -64622,7 +66403,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Sign<T>
+pub struct Sign<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -64707,7 +66488,13 @@ where T: TensorType,
             new_op.add_edge(&self.crops)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("block_size", *attr)})(&self.block_size)?
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
         }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
@@ -64716,7 +66503,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchToSpace<T, Tidx>
+pub struct BatchToSpace<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -64818,6 +66605,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adjoint", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -64825,7 +66615,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixSolve<T>
+pub struct MatrixSolve<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -64914,6 +66704,9 @@ where dtype: TensorType,
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.container {
                 None => new_op.set_attr_value_proto("container", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("container", attr)})(&value)?,
@@ -64932,7 +66725,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct VariableV2<dtype>
+pub struct VariableV2<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -65037,6 +66830,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -65044,7 +66843,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Max<T, Tidx>
+pub struct Max<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -65155,7 +66954,7 @@ impl GraphOperation for StringSplitV2 {
 }
 
 #[derive(Clone)]
-struct StringSplitV2 {
+pub struct StringSplitV2 {
     input: Edge<String>,
     sep: Edge<String>,
     maxsplit: Option<i64>,
@@ -65256,6 +67055,9 @@ where T: TensorType,
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("sa_name", attr)})(&self.sa_name)?
         }
         {
@@ -65271,7 +67073,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _ScopedAllocator<T>
+pub struct _ScopedAllocator<T>
 where T: TensorType,
       T: 'static,
       T: Clone,
@@ -65359,6 +67161,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -65366,7 +67171,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixLogarithm<T>
+pub struct MatrixLogarithm<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -65441,6 +67246,9 @@ where dtype: TensorType,
         };
         let mut new_op = graph.new_operation("FakeParam", &op_name)?;
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_shape("shape", attr)})(&self.shape)?
         }
         let op = new_op.finish()?;
@@ -65450,7 +67258,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct FakeParam<dtype>
+pub struct FakeParam<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -65530,6 +67338,9 @@ where T: TensorType,
             new_op.add_edge(&self.rhs)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("dimension_numbers", attr)})(&self.dimension_numbers)?
         }
         {
@@ -65542,7 +67353,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct XlaDot<T>
+pub struct XlaDot<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -65629,6 +67440,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -65636,7 +67450,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Softsign<T>
+pub struct Softsign<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -65727,6 +67541,9 @@ where T: TensorType,
             new_op.add_edge(&self.score_threshold)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.pad_to_max_output_size {
                 None => new_op.set_attr_value_proto("pad_to_max_output_size", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("pad_to_max_output_size", *attr)})(&value)?,
@@ -65739,7 +67556,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NonMaxSuppressionV4<T>
+pub struct NonMaxSuppressionV4<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_HALF,
@@ -65846,6 +67663,9 @@ where T: TensorType,
         };
         let mut new_op = graph.new_operation("_Arg", &op_name)?;
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("index", *attr)})(&self.index)?
         }
         let op = new_op.finish()?;
@@ -65855,7 +67675,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _Arg<T>
+pub struct _Arg<T>
 where T: TensorType,
       T: 'static,
       T: Clone,
@@ -65934,6 +67754,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -65941,7 +67764,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TruncateDiv<T>
+pub struct TruncateDiv<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -66019,6 +67842,9 @@ where T: TensorType,
         };
         let mut new_op = graph.new_operation("_DeviceArg", &op_name)?;
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("index", *attr)})(&self.index)?
         }
         let op = new_op.finish()?;
@@ -66028,7 +67854,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _DeviceArg<T>
+pub struct _DeviceArg<T>
 where T: TensorType,
       T: 'static,
       T: Clone,
@@ -66109,7 +67935,7 @@ impl GraphOperation for RFFT3D {
 }
 
 #[derive(Clone)]
-struct RFFT3D {
+pub struct RFFT3D {
     input: Edge<f32>,
     fft_length: Edge<i32>,
     op_name: Option<String>,
@@ -66179,7 +68005,7 @@ impl GraphOperation for LogicalNot {
 }
 
 #[derive(Clone)]
-struct LogicalNot {
+pub struct LogicalNot {
     x: Edge<bool>,
     op_name: Option<String>,
     id_: usize,
@@ -66266,6 +68092,9 @@ where T: TensorType,
             new_op.add_edge(&self.lr_power)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -66278,7 +68107,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyFtrl<T>
+pub struct ApplyFtrl<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -66385,6 +68214,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("index", *attr)})(&self.index)?
         }
         let op = new_op.finish()?;
@@ -66394,7 +68226,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _Retval<T>
+pub struct _Retval<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -66465,6 +68297,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("index", *attr)})(&self.index)?
         }
         let op = new_op.finish()?;
@@ -66474,7 +68309,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _DeviceRetval<T>
+pub struct _DeviceRetval<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -66548,6 +68383,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -66555,7 +68393,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Xdivy<T>
+pub struct Xdivy<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128_or_DT_HALF,
@@ -66639,6 +68477,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.b)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -66646,7 +68487,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Cross<T>
+pub struct Cross<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -66733,6 +68574,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.flow_in)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.element_shape {
                 None => new_op.set_attr_value_proto("element_shape", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("element_shape", attr)})(&value)?,
@@ -66745,7 +68589,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayGather<dtype>
+pub struct TensorArrayGather<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -66842,6 +68686,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -66849,7 +68699,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SegmentProd<T, Tindices>
+pub struct SegmentProd<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -66949,6 +68799,12 @@ where Tin: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("Tin", Tin::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -66956,7 +68812,7 @@ where Tin: TensorType,
 }
 
 #[derive(Clone)]
-struct LookupTableInsert<Tin, Tout>
+pub struct LookupTableInsert<Tin, Tout>
 where Tin: TensorType,
       Tin: Clone,
       Tout: TensorType,
@@ -67040,6 +68896,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_float_list("boundaries", attrs)})(&self.boundaries)?
         }
         let op = new_op.finish()?;
@@ -67049,7 +68908,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Bucketize<T>
+pub struct Bucketize<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64,
@@ -67136,6 +68995,9 @@ where dt: TensorType,
             new_op.add_edge(&self.shape_and_slice)?
         }
         {
+            new_op.set_attr_type("dt", dt::data_type())?;
+        }
+        {
             match self.preferred_shard {
                 None => new_op.set_attr_value_proto("preferred_shard", &vec![24_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("preferred_shard", *attr)})(&value)?,
@@ -67148,7 +69010,7 @@ where dt: TensorType,
 }
 
 #[derive(Clone)]
-struct RestoreSlice<dt>
+pub struct RestoreSlice<dt>
 where dt: TensorType,
       dt: 'static,
       dt: Clone,
@@ -67255,7 +69117,7 @@ impl GraphOperation for RetrieveTPUEmbeddingStochasticGradientDescentParameters 
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingStochasticGradientDescentParameters {
+pub struct RetrieveTPUEmbeddingStochasticGradientDescentParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -67358,6 +69220,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("reverse", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -67365,7 +69233,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Cumprod<T, Tidx>
+pub struct Cumprod<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -67477,6 +69345,9 @@ where T: TensorType,
             new_op.add_edge(&self.size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -67489,7 +69360,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ResizeBicubic<T>
+pub struct ResizeBicubic<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_HALF,
@@ -67578,6 +69449,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -67585,7 +69459,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Log1p<T>
+pub struct Log1p<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -67697,6 +69571,9 @@ where T: TensorType,
             new_op.add_edge(&self.size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -67709,7 +69586,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ResizeBilinear<T>
+pub struct ResizeBilinear<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF,
@@ -67811,6 +69688,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -67818,7 +69701,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Prod<T, Tidx>
+pub struct Prod<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -67897,7 +69780,8 @@ where T: TensorType,
 }
 
 impl<component_types> GraphOperation for PaddingFIFOQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     fn get_id(&self) -> usize {
@@ -67913,6 +69797,9 @@ where component_types: 'static,
             None => graph.new_op_name("PaddingFIFOQueue_{}")?
         };
         let mut new_op = graph.new_operation("PaddingFIFOQueue", &op_name)?;
+        {
+            new_op.set_attr_type("component_types", component_types::data_type())?;
+        }
         {
             match self.shapes {
                 None => new_op.set_attr_value_proto("shapes", &vec![10_u8, 0_u8,])?,
@@ -67944,8 +69831,9 @@ where component_types: 'static,
 }
 
 #[derive(Clone)]
-struct PaddingFIFOQueue<component_types>
-where component_types: 'static,
+pub struct PaddingFIFOQueue<component_types>
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     phantom_component_types: PhantomData<component_types>,
@@ -67958,7 +69846,8 @@ where component_types: 'static,
 }
 
 impl<component_types> PaddingFIFOQueue<component_types>
-where component_types: 'static,
+where component_types: TensorType,
+      component_types: 'static,
       component_types: Clone,
 {
     pub fn handle(self) -> Edge<String> {
@@ -68069,6 +69958,9 @@ where T: TensorType,
             new_op.add_edge(&self.max)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -68081,7 +69973,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedResizeBilinear<T>
+pub struct QuantizedResizeBilinear<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_QUINT8_or_DT_QINT32,
@@ -68201,6 +70093,9 @@ where dt: TensorType,
             new_op.add_edge(&self.tensor_name)?
         }
         {
+            new_op.set_attr_type("dt", dt::data_type())?;
+        }
+        {
             match self.preferred_shard {
                 None => new_op.set_attr_value_proto("preferred_shard", &vec![24_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("preferred_shard", *attr)})(&value)?,
@@ -68213,7 +70108,7 @@ where dt: TensorType,
 }
 
 #[derive(Clone)]
-struct Restore<dt>
+pub struct Restore<dt>
 where dt: TensorType,
       dt: 'static,
       dt: Clone,
@@ -68304,6 +70199,9 @@ where T: TensorType,
             new_op.add_edge(&self.original_image)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -68316,7 +70214,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ResizeBilinearGrad<T>
+pub struct ResizeBilinearGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -68405,6 +70303,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -68412,7 +70313,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Ceil<T>
+pub struct Ceil<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -68494,6 +70395,9 @@ where T: TensorType,
             new_op.add_edge(&self.size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -68506,7 +70410,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ResizeNearestNeighbor<T>
+pub struct ResizeNearestNeighbor<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_HALF,
@@ -68623,6 +70527,9 @@ where T: TensorType,
             new_op.add_edge(&self.size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.seed {
                 None => new_op.set_attr_value_proto("seed", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed", *attr)})(&value)?,
@@ -68641,7 +70548,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomCrop<T>
+pub struct RandomCrop<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64,
@@ -68737,6 +70644,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.tensor)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -68744,7 +70654,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SerializeTensor<T>
+pub struct SerializeTensor<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -68823,6 +70733,12 @@ where SrcT: TensorType,
             new_op.add_edge(&self.x)?
         }
         {
+            new_op.set_attr_type("SrcT", SrcT::data_type())?;
+        }
+        {
+            new_op.set_attr_type("DstT", DstT::data_type())?;
+        }
+        {
             match self.Truncate {
                 None => new_op.set_attr_value_proto("Truncate", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("Truncate", *attr)})(&value)?,
@@ -68835,7 +70751,7 @@ where SrcT: TensorType,
 }
 
 #[derive(Clone)]
-struct _HostCast<SrcT, DstT>
+pub struct _HostCast<SrcT, DstT>
 where SrcT: TensorType,
       SrcT: Clone,
       DstT: TensorType,
@@ -68947,6 +70863,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("output_dtype", output_dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -68954,7 +70876,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Multinomial<T, output_dtype>
+pub struct Multinomial<T, output_dtype>
 where T: TensorType,
       T: Clone,
       output_dtype: TensorType,
@@ -69118,7 +71040,7 @@ impl GraphOperation for EncodeJpeg {
 }
 
 #[derive(Clone)]
-struct EncodeJpeg {
+pub struct EncodeJpeg {
     image: Edge<u8>,
     format: Option<String>,
     quality: Option<i64>,
@@ -69268,6 +71190,9 @@ where T: TensorType,
             new_op.add_edge(&self.backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &f32| {new_op.set_attr_float("variance_epsilon", *attr)})(&self.variance_epsilon)?
         }
         {
@@ -69280,7 +71205,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchNormWithGlobalNormalizationGrad<T>
+pub struct BatchNormWithGlobalNormalizationGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -69423,7 +71348,7 @@ impl GraphOperation for AdjustContrastv2 {
 }
 
 #[derive(Clone)]
-struct AdjustContrastv2 {
+pub struct AdjustContrastv2 {
     images: Edge<f32>,
     contrast_factor: Edge<f32>,
     op_name: Option<String>,
@@ -69506,6 +71431,9 @@ where dtype: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("channels", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -69513,7 +71441,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct DecodePng<dtype>
+pub struct DecodePng<dtype>
 where dtype: TensorType,
       dtype: con_or_DT_UINT8_or_DT_UINT16,
       dtype: 'static,
@@ -69615,6 +71543,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -69627,7 +71558,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyProximalAdagrad<T>
+pub struct ApplyProximalAdagrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -69731,6 +71662,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -69738,7 +71672,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BitwiseOr<T>
+pub struct BitwiseOr<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_UINT32_or_DT_UINT64,
@@ -69826,6 +71760,9 @@ where T: TensorType,
             new_op.add_edge(&self.l2_regularizer)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.fast {
                 None => new_op.set_attr_value_proto("fast", &vec![40_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("fast", *attr)})(&value)?,
@@ -69838,7 +71775,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixSolveLs<T>
+pub struct MatrixSolveLs<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -69952,6 +71889,9 @@ where T: TensorType,
             new_op.add_edge(&self.bounding_boxes)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.seed {
                 None => new_op.set_attr_value_proto("seed", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed", *attr)})(&value)?,
@@ -70000,7 +71940,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SampleDistortedBoundingBox<T>
+pub struct SampleDistortedBoundingBox<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64,
@@ -70162,6 +72102,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -70169,7 +72112,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Greater<T>
+pub struct Greater<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -70257,6 +72200,9 @@ where T: TensorType,
             new_op.add_edge(&self.min_object_covered)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.seed {
                 None => new_op.set_attr_value_proto("seed", &vec![24_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed", *attr)})(&value)?,
@@ -70299,7 +72245,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SampleDistortedBoundingBoxV2<T>
+pub struct SampleDistortedBoundingBoxV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64,
@@ -70463,6 +72409,9 @@ where T: TensorType,
             new_op.add_edge(&self.crop_size)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.method {
                 None => new_op.set_attr_value_proto("method", &vec![18_u8, 8_u8, 98_u8, 105_u8, 108_u8, 105_u8, 110_u8, 101_u8, 97_u8, 114_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("method", attr)})(&value)?,
@@ -70481,7 +72430,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CropAndResize<T>
+pub struct CropAndResize<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_HALF,
@@ -70584,6 +72533,9 @@ where Tcomplex: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("Tcomplex", Tcomplex::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -70591,7 +72543,7 @@ where Tcomplex: TensorType,
 }
 
 #[derive(Clone)]
-struct FFT3D<Tcomplex>
+pub struct FFT3D<Tcomplex>
 where Tcomplex: TensorType,
       Tcomplex: Clone,
       Tcomplex: con_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -70679,6 +72631,9 @@ where T: TensorType,
             new_op.add_edge(&self.box_ind)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.method {
                 None => new_op.set_attr_value_proto("method", &vec![18_u8, 8_u8, 98_u8, 105_u8, 108_u8, 105_u8, 110_u8, 101_u8, 97_u8, 114_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("method", attr)})(&value)?,
@@ -70691,7 +72646,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct CropAndResizeGradBoxes<T>
+pub struct CropAndResizeGradBoxes<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_HALF,
@@ -70798,6 +72753,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.score_threshold)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -70805,7 +72763,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NonMaxSuppressionV3<T>
+pub struct NonMaxSuppressionV3<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_HALF,
@@ -70894,7 +72852,7 @@ impl GraphOperation for NoOp {
 }
 
 #[derive(Clone)]
-struct NoOp {
+pub struct NoOp {
     op_name: Option<String>,
     id_: usize,
 }
@@ -70959,7 +72917,7 @@ impl GraphOperation for MergeV2Checkpoints {
 }
 
 #[derive(Clone)]
-struct MergeV2Checkpoints {
+pub struct MergeV2Checkpoints {
     checkpoint_prefixes: Edge<String>,
     destination_prefix: Edge<String>,
     delete_old_dirs: Option<bool>,
@@ -71032,7 +72990,7 @@ impl GraphOperation for ShardedFilespec {
 }
 
 #[derive(Clone)]
-struct ShardedFilespec {
+pub struct ShardedFilespec {
     basename: Edge<String>,
     num_shards: Edge<i32>,
     op_name: Option<String>,
@@ -71111,7 +73069,7 @@ impl GraphOperation for WholeFileReader {
 }
 
 #[derive(Clone)]
-struct WholeFileReader {
+pub struct WholeFileReader {
     container: Option<String>,
     shared_name: Option<String>,
     op_name: Option<String>,
@@ -71215,7 +73173,7 @@ impl GraphOperation for LoadAndRemapMatrix {
 }
 
 #[derive(Clone)]
-struct LoadAndRemapMatrix {
+pub struct LoadAndRemapMatrix {
     ckpt_path: Edge<String>,
     old_tensor_name: Edge<String>,
     row_remapping: Edge<i64>,
@@ -71338,7 +73296,7 @@ impl GraphOperation for FixedLengthRecordReader {
 }
 
 #[derive(Clone)]
-struct FixedLengthRecordReader {
+pub struct FixedLengthRecordReader {
     header_bytes: Option<i64>,
     record_bytes: i64,
     footer_bytes: Option<i64>,
@@ -71446,6 +73404,12 @@ where SrcT: TensorType,
             new_op.add_edge(&self.x)?
         }
         {
+            new_op.set_attr_type("SrcT", SrcT::data_type())?;
+        }
+        {
+            new_op.set_attr_type("DstT", DstT::data_type())?;
+        }
+        {
             match self.Truncate {
                 None => new_op.set_attr_value_proto("Truncate", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("Truncate", *attr)})(&value)?,
@@ -71458,7 +73422,7 @@ where SrcT: TensorType,
 }
 
 #[derive(Clone)]
-struct Cast<SrcT, DstT>
+pub struct Cast<SrcT, DstT>
 where SrcT: TensorType,
       SrcT: Clone,
       DstT: TensorType,
@@ -71568,7 +73532,7 @@ impl GraphOperation for TFRecordReader {
 }
 
 #[derive(Clone)]
-struct TFRecordReader {
+pub struct TFRecordReader {
     container: Option<String>,
     shared_name: Option<String>,
     compression_type: Option<String>,
@@ -71654,6 +73618,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -71661,7 +73628,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Sinh<T>
+pub struct Sinh<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -71749,6 +73716,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -71756,7 +73729,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentSum<T, Tidx>
+pub struct SparseSegmentSum<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -71862,7 +73835,7 @@ impl GraphOperation for LMDBReader {
 }
 
 #[derive(Clone)]
-struct LMDBReader {
+pub struct LMDBReader {
     container: Option<String>,
     shared_name: Option<String>,
     op_name: Option<String>,
@@ -71963,6 +73936,15 @@ where S: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("S", S::data_type())?;
+        }
+        {
+            new_op.set_attr_type("R", R::data_type())?;
+        }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -71970,7 +73952,7 @@ where S: TensorType,
 }
 
 #[derive(Clone)]
-struct RandomPoissonV2<S, R, dtype>
+pub struct RandomPoissonV2<S, R, dtype>
 where S: TensorType,
       S: Clone,
       R: TensorType,
@@ -72106,7 +74088,7 @@ impl GraphOperation for RetrieveTPUEmbeddingRMSPropParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingRMSPropParametersGradAccumDebug {
+pub struct RetrieveTPUEmbeddingRMSPropParametersGradAccumDebug {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -72233,7 +74215,7 @@ impl GraphOperation for IdentityReader {
 }
 
 #[derive(Clone)]
-struct IdentityReader {
+pub struct IdentityReader {
     container: Option<String>,
     shared_name: Option<String>,
     op_name: Option<String>,
@@ -72332,6 +74314,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("range_given", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -72339,7 +74324,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizeAndDequantizeV3<T>
+pub struct QuantizeAndDequantizeV3<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -72447,7 +74432,7 @@ impl GraphOperation for ReaderRead {
 }
 
 #[derive(Clone)]
-struct ReaderRead {
+pub struct ReaderRead {
     reader_handle: Edge<String>,
     queue_handle: Edge<String>,
     op_name: Option<String>,
@@ -72529,7 +74514,7 @@ impl GraphOperation for ReaderNumRecordsProduced {
 }
 
 #[derive(Clone)]
-struct ReaderNumRecordsProduced {
+pub struct ReaderNumRecordsProduced {
     reader_handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -72594,6 +74579,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -72601,7 +74589,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Tan<T>
+pub struct Tan<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -72681,7 +74669,7 @@ impl GraphOperation for ReaderSerializeState {
 }
 
 #[derive(Clone)]
-struct ReaderSerializeState {
+pub struct ReaderSerializeState {
     reader_handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -72745,6 +74733,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.data)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -72752,7 +74743,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Exit<T>
+pub struct Exit<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -72845,7 +74836,7 @@ impl GraphOperation for RetrieveTPUEmbeddingProximalAdagradParameters {
 }
 
 #[derive(Clone)]
-struct RetrieveTPUEmbeddingProximalAdagradParameters {
+pub struct RetrieveTPUEmbeddingProximalAdagradParameters {
     table_id: Option<i64>,
     table_name: Option<String>,
     num_shards: i64,
@@ -72962,6 +74953,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -72969,7 +74963,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolGradV2<T>
+pub struct MaxPoolGradV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -73076,6 +75070,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.gradient)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -73083,7 +75080,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct AccumulatorApplyGradient<dtype>
+pub struct AccumulatorApplyGradient<dtype>
 where dtype: TensorType,
       dtype: Clone,
       dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -73159,6 +75156,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -73166,7 +75166,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Abs<T>
+pub struct Abs<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16_or_DT_HALF,
@@ -73244,6 +75244,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -73251,7 +75254,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Cholesky<T>
+pub struct Cholesky<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -73349,6 +75352,12 @@ where T: TensorType,
             new_op.add_edge(&self.indices)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -73361,7 +75370,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseApplyProximalGradientDescent<T, Tindices>
+pub struct SparseApplyProximalGradientDescent<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -73475,7 +75484,7 @@ impl GraphOperation for MatchingFiles {
 }
 
 #[derive(Clone)]
-struct MatchingFiles {
+pub struct MatchingFiles {
     pattern: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -73572,7 +75581,7 @@ impl GraphOperation for BigQueryReader {
 }
 
 #[derive(Clone)]
-struct BigQueryReader {
+pub struct BigQueryReader {
     container: Option<String>,
     shared_name: Option<String>,
     project_id: String,
@@ -73673,6 +75682,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -73680,7 +75692,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixDeterminant<T>
+pub struct MatrixDeterminant<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -73764,6 +75776,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adjoint", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -73771,7 +75786,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixInverse<T>
+pub struct MatrixInverse<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -73856,6 +75871,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.handle)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -73863,7 +75881,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct GetSessionTensor<dtype>
+pub struct GetSessionTensor<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -73942,6 +75960,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dy)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -73949,7 +75970,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SqrtGrad<T>
+pub struct SqrtGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -74054,6 +76075,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.deltas)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74061,7 +76085,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RaggedRange<T>
+pub struct RaggedRange<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16,
@@ -74157,6 +76181,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74164,7 +76191,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatrixExponential<T>
+pub struct MatrixExponential<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -74251,6 +76278,9 @@ where Tidx: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74258,7 +76288,7 @@ where Tidx: TensorType,
 }
 
 #[derive(Clone)]
-struct All<Tidx>
+pub struct All<Tidx>
 where Tidx: TensorType,
       Tidx: Clone,
       Tidx: con_or_DT_INT32_or_DT_INT64,
@@ -74347,6 +76377,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74354,7 +76387,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SelfAdjointEig<T>
+pub struct SelfAdjointEig<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -74438,6 +76471,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("compute_v", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74445,7 +76481,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchSelfAdjointEigV2<T>
+pub struct BatchSelfAdjointEigV2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -74555,6 +76591,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("full_matrices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74562,7 +76601,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Svd<T>
+pub struct Svd<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -74678,6 +76717,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74685,7 +76727,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchSelfAdjointEig<T>
+pub struct BatchSelfAdjointEig<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -74772,6 +76814,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adjoint", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74779,7 +76824,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixSolve<T>
+pub struct BatchMatrixSolve<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -74875,6 +76920,9 @@ where T: TensorType,
             new_op.add_edge(&self.l2_regularizer)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.fast {
                 None => new_op.set_attr_value_proto("fast", &vec![40_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("fast", *attr)})(&value)?,
@@ -74887,7 +76935,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixSolveLs<T>
+pub struct BatchMatrixSolveLs<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -74979,6 +77027,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.images)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -74986,7 +77037,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RGBToHSV<T>
+pub struct RGBToHSV<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -75076,6 +77127,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("full_matrices", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -75083,7 +77137,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchSvd<T>
+pub struct BatchSvd<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -75199,6 +77253,9 @@ where Tcomplex: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("Tcomplex", Tcomplex::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -75206,7 +77263,7 @@ where Tcomplex: TensorType,
 }
 
 #[derive(Clone)]
-struct IFFT3D<Tcomplex>
+pub struct IFFT3D<Tcomplex>
 where Tcomplex: TensorType,
       Tcomplex: Clone,
       Tcomplex: con_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -75284,6 +77341,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -75291,7 +77351,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Invert<T>
+pub struct Invert<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_UINT32_or_DT_UINT64,
@@ -75376,6 +77436,9 @@ where T: TensorType,
             new_op.add_edge(&self.max_range)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.mode {
                 None => new_op.set_attr_value_proto("mode", &vec![18_u8, 12_u8, 77_u8, 73_u8, 78_u8, 95_u8, 67_u8, 79_u8, 77_u8, 66_u8, 73_u8, 78_u8, 69_u8, 68_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("mode", attr)})(&value)?,
@@ -75388,7 +77451,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Dequantize<T>
+pub struct Dequantize<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
@@ -75459,8 +77522,10 @@ where T: TensorType,
 }
 
 impl<key_dtype, value_dtype> GraphOperation for MutableHashTableOfTensors<key_dtype, value_dtype>
-where key_dtype: 'static,
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -75496,6 +77561,12 @@ where key_dtype: 'static,
             };
         }
         {
+            new_op.set_attr_type("key_dtype", key_dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("value_dtype", value_dtype::data_type())?;
+        }
+        {
             match self.value_shape {
                 None => new_op.set_attr_value_proto("value_shape", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("value_shape", attr)})(&value)?,
@@ -75508,9 +77579,11 @@ where key_dtype: 'static,
 }
 
 #[derive(Clone)]
-struct MutableHashTableOfTensors<key_dtype, value_dtype>
-where key_dtype: 'static,
+pub struct MutableHashTableOfTensors<key_dtype, value_dtype>
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -75525,8 +77598,10 @@ where key_dtype: 'static,
 }
 
 impl<key_dtype, value_dtype> MutableHashTableOfTensors<key_dtype, value_dtype>
-where key_dtype: 'static,
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -75639,6 +77714,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -75646,7 +77724,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MaxPoolGradGrad<T>
+pub struct MaxPoolGradGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -75750,6 +77828,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -75757,7 +77838,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct RightShift<T>
+pub struct RightShift<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_UINT32_or_DT_UINT64,
@@ -75848,6 +77929,9 @@ where T: TensorType,
             new_op.add_edge(&self.grad)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.use_locking {
                 None => new_op.set_attr_value_proto("use_locking", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_locking", *attr)})(&value)?,
@@ -75866,7 +77950,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApplyAdagrad<T>
+pub struct ApplyAdagrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -75983,7 +78067,7 @@ impl GraphOperation for AudioSummaryV2 {
 }
 
 #[derive(Clone)]
-struct AudioSummaryV2 {
+pub struct AudioSummaryV2 {
     tag: Edge<String>,
     tensor: Edge<f32>,
     sample_rate: Edge<f32>,
@@ -76090,6 +78174,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("seed2", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -76097,7 +78187,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ParameterizedTruncatedNormal<T, dtype>
+pub struct ParameterizedTruncatedNormal<T, dtype>
 where T: TensorType,
       T: Clone,
       dtype: TensorType,
@@ -76214,6 +78304,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.diagonal)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -76221,7 +78314,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Diag<T>
+pub struct Diag<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -76330,6 +78423,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.precision {
                 None => new_op.set_attr_value_proto("precision", &vec![24_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 255_u8, 1_u8,])?,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("precision", *attr)})(&value)?,
@@ -76366,7 +78462,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AsString<T>
+pub struct AsString<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BOOL_or_DT_COMPLEX128,
@@ -76492,6 +78588,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -76499,7 +78598,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayScatterV2<T>
+pub struct TensorArrayScatterV2<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -76606,6 +78705,9 @@ where T: TensorType,
             };
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.bad_color {
                 None => new_op.set_attr_value_proto("bad_color", &vec![66_u8, 0_u8, 8_u8, 4_u8, 18_u8, 0_u8, 18_u8, 0_u8, 8_u8, 4_u8, 58_u8, 6_u8, 255_u8, 1_u8, 0_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &Rc<AnyTensor>| {new_op.set_attr_tensor_owned("bad_color", attr.clone())})(&value)?,
@@ -76618,7 +78720,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ImageSummary<T>
+pub struct ImageSummary<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_UINT8_or_DT_HALF,
@@ -76651,11 +78753,12 @@ where T: TensorType,
         self.clone()
     }
 
-    pub fn bad_color<bad_color_T>(&mut self, bad_color: bad_color_T) -> Self
-    where bad_color_T: AnyTensor,
+    pub fn bad_color<bad_color_T, bad_color_TensorType>(&mut self, bad_color: bad_color_T) -> Self
+    where Tensor<bad_color_TensorType>: From<bad_color_T>,
           bad_color_T: 'static,
+          bad_color_TensorType: TensorType,
     {
-        self.bad_color = Some(Rc::new(bad_color));
+        self.bad_color = Some(Rc::new(Tensor::<bad_color_TensorType>::from(bad_color)));
         self.clone()
     }
 
@@ -76733,6 +78836,9 @@ where T: TensorType,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -76740,7 +78846,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AvgPool<T>
+pub struct AvgPool<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -76840,7 +78946,7 @@ impl GraphOperation for MergeSummary {
 }
 
 #[derive(Clone)]
-struct MergeSummary {
+pub struct MergeSummary {
     inputs: Edge<String>,
     N: i64,
     op_name: Option<String>,
@@ -76907,7 +79013,7 @@ impl GraphOperation for Timestamp {
 }
 
 #[derive(Clone)]
-struct Timestamp {
+pub struct Timestamp {
     op_name: Option<String>,
     id_: usize,
 }
@@ -76968,6 +79074,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -76975,7 +79084,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixDiagPart<T>
+pub struct BatchMatrixDiagPart<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -77058,6 +79167,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -77065,7 +79180,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SegmentMin<T, Tindices>
+pub struct SegmentMin<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -77161,6 +79276,9 @@ where T: TensorType,
             new_op.add_edge(&self.original_image)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.align_corners {
                 None => new_op.set_attr_value_proto("align_corners", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("align_corners", *attr)})(&value)?,
@@ -77173,7 +79291,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ResizeBicubicGrad<T>
+pub struct ResizeBicubicGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -77241,8 +79359,10 @@ where T: TensorType,
 }
 
 impl<key_dtype, value_dtype> GraphOperation for HashTable<key_dtype, value_dtype>
-where key_dtype: 'static,
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -77277,6 +79397,12 @@ where key_dtype: 'static,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_node_name_sharing", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("key_dtype", key_dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("value_dtype", value_dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -77284,9 +79410,11 @@ where key_dtype: 'static,
 }
 
 #[derive(Clone)]
-struct HashTable<key_dtype, value_dtype>
-where key_dtype: 'static,
+pub struct HashTable<key_dtype, value_dtype>
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -77300,8 +79428,10 @@ where key_dtype: 'static,
 }
 
 impl<key_dtype, value_dtype> HashTable<key_dtype, value_dtype>
-where key_dtype: 'static,
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -77365,8 +79495,10 @@ where key_dtype: 'static,
 }
 
 impl<key_dtype, value_dtype> GraphOperation for MutableHashTable<key_dtype, value_dtype>
-where key_dtype: 'static,
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -77401,6 +79533,12 @@ where key_dtype: 'static,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("use_node_name_sharing", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("key_dtype", key_dtype::data_type())?;
+        }
+        {
+            new_op.set_attr_type("value_dtype", value_dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -77408,9 +79546,11 @@ where key_dtype: 'static,
 }
 
 #[derive(Clone)]
-struct MutableHashTable<key_dtype, value_dtype>
-where key_dtype: 'static,
+pub struct MutableHashTable<key_dtype, value_dtype>
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -77424,8 +79564,10 @@ where key_dtype: 'static,
 }
 
 impl<key_dtype, value_dtype> MutableHashTable<key_dtype, value_dtype>
-where key_dtype: 'static,
+where key_dtype: TensorType,
+      key_dtype: 'static,
       key_dtype: Clone,
+      value_dtype: TensorType,
       value_dtype: 'static,
       value_dtype: Clone,
 {
@@ -77518,6 +79660,12 @@ where Tkey: TensorType,
         {
             new_op.add_edge(&self.values)?
         }
+        {
+            new_op.set_attr_type("Tkey", Tkey::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tval", Tval::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -77525,7 +79673,7 @@ where Tkey: TensorType,
 }
 
 #[derive(Clone)]
-struct InitializeTable<Tkey, Tval>
+pub struct InitializeTable<Tkey, Tval>
 where Tkey: TensorType,
       Tkey: Clone,
       Tval: TensorType,
@@ -77607,7 +79755,7 @@ impl GraphOperation for ShutdownDistributedTPU {
 }
 
 #[derive(Clone)]
-struct ShutdownDistributedTPU {
+pub struct ShutdownDistributedTPU {
     op_name: Option<String>,
     id_: usize,
 }
@@ -77670,6 +79818,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.max_value)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -77677,7 +79828,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AdjustContrast<T>
+pub struct AdjustContrast<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64,
@@ -77790,7 +79941,7 @@ impl GraphOperation for TryRpc {
 }
 
 #[derive(Clone)]
-struct TryRpc {
+pub struct TryRpc {
     address: Edge<String>,
     method: Edge<String>,
     request: Edge<String>,
@@ -77907,6 +80058,9 @@ where T: TensorType,
             new_op.add_edge(&self.data)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("frame_name", attr)})(&self.frame_name)?
         }
         {
@@ -77928,7 +80082,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Enter<T>
+pub struct Enter<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -78023,6 +80177,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78030,7 +80187,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatrixDeterminant<T>
+pub struct BatchMatrixDeterminant<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_COMPLEX128,
@@ -78153,6 +80310,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78160,7 +80320,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct AddN<T>
+pub struct AddN<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_VARIANT_or_DT_UINT32_or_DT_UINT64,
@@ -78245,6 +80405,9 @@ where T: TensorType,
             new_op.add_edge(&self.y)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.adj_x {
                 None => new_op.set_attr_value_proto("adj_x", &vec![40_u8, 0_u8,])?,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("adj_x", *attr)})(&value)?,
@@ -78263,7 +80426,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchMatMul<T>
+pub struct BatchMatMul<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -78360,6 +80523,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78367,7 +80533,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Square<T>
+pub struct Square<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -78452,6 +80618,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -78470,7 +80639,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv3DBackpropFilter<T>
+pub struct Conv3DBackpropFilter<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -78568,6 +80737,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78575,7 +80747,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Sqrt<T>
+pub struct Sqrt<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -78653,6 +80825,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78660,7 +80835,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Exp<T>
+pub struct Exp<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -78747,6 +80922,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("reverse", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78754,7 +80932,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NthElement<T>
+pub struct NthElement<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -78857,6 +81035,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_segments)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tnumsegments", Tnumsegments::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78864,7 +81051,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UnsortedSegmentMax<T, Tindices, Tnumsegments>
+pub struct UnsortedSegmentMax<T, Tindices, Tnumsegments>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -78970,6 +81157,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.features)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -78977,7 +81167,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Softplus<T>
+pub struct Softplus<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -79055,6 +81245,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79062,7 +81255,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Expm1<T>
+pub struct Expm1<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -79140,6 +81333,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79147,7 +81343,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Log<T>
+pub struct Log<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -79242,6 +81438,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_segments)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tnumsegments", Tnumsegments::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79249,7 +81454,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentMeanWithNumSegments<T, Tidx, Tnumsegments>
+pub struct SparseSegmentMeanWithNumSegments<T, Tidx, Tnumsegments>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -79358,6 +81563,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79365,7 +81573,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Cosh<T>
+pub struct Cosh<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -79450,6 +81658,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79457,7 +81671,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SegmentMax<T, Tindices>
+pub struct SegmentMax<T, Tindices>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -79549,6 +81763,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79556,7 +81773,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Tanh<T>
+pub struct Tanh<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -79660,7 +81877,7 @@ impl GraphOperation for UnicodeTranscode {
 }
 
 #[derive(Clone)]
-struct UnicodeTranscode {
+pub struct UnicodeTranscode {
     input: Edge<String>,
     input_encoding: String,
     output_encoding: String,
@@ -79755,6 +81972,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79762,7 +81982,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Asinh<T>
+pub struct Asinh<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -79840,6 +82060,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.images)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79847,7 +82070,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct HSVToRGB<T>
+pub struct HSVToRGB<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -79928,6 +82151,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dy)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -79935,7 +82161,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SigmoidGrad<T>
+pub struct SigmoidGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -80016,6 +82242,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80023,7 +82252,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Sin<T>
+pub struct Sin<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -80101,6 +82330,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80108,7 +82340,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Acos<T>
+pub struct Acos<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -80186,6 +82418,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80193,7 +82428,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BesselI0e<T>
+pub struct BesselI0e<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -80277,6 +82512,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.perm)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tperm", Tperm::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80284,7 +82525,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Transpose<T, Tperm>
+pub struct Transpose<T, Tperm>
 where T: TensorType,
       T: Clone,
       Tperm: TensorType,
@@ -80387,6 +82628,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80394,7 +82641,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Min<T, Tidx>
+pub struct Min<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -80494,6 +82741,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80501,7 +82751,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BesselI1e<T>
+pub struct BesselI1e<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -80580,6 +82830,9 @@ where T: TensorType,
             new_op.add_edge(&self.x)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_string_list("op_names", attrs)})(&self.op_names)?
         }
         let op = new_op.finish()?;
@@ -80589,7 +82842,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _UnaryOpsComposition<T>
+pub struct _UnaryOpsComposition<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -80670,6 +82923,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80677,7 +82933,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct IsInf<T>
+pub struct IsInf<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -80755,6 +83011,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80762,7 +83021,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Rint<T>
+pub struct Rint<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -80843,6 +83102,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80850,7 +83112,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Sub<T>
+pub struct Sub<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -80940,6 +83202,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.mkl_y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -80947,7 +83212,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _MklSub<T>
+pub struct _MklSub<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -81069,7 +83334,7 @@ impl GraphOperation for BoostedTreesCalculateBestGainsPerFeature {
 }
 
 #[derive(Clone)]
-struct BoostedTreesCalculateBestGainsPerFeature {
+pub struct BoostedTreesCalculateBestGainsPerFeature {
     node_id_range: Edge<i32>,
     stats_summary_list: Edge<f32>,
     l1: Edge<f32>,
@@ -81203,6 +83468,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &i64| {new_op.set_attr_int("compression", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -81210,7 +83478,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct EncodePng<T>
+pub struct EncodePng<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_UINT8_or_DT_UINT16,
@@ -81305,6 +83573,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.mkl_y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -81312,7 +83583,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _MklMul<T>
+pub struct _MklMul<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -81414,6 +83685,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -81421,7 +83695,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Div<T>
+pub struct Div<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -81505,6 +83779,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.flow_in)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.element_shape {
                 None => new_op.set_attr_value_proto("element_shape", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("element_shape", attr)})(&value)?,
@@ -81517,7 +83794,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayPack<dtype>
+pub struct TensorArrayPack<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -81607,6 +83884,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -81614,7 +83894,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Maximum<T>
+pub struct Maximum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16_or_DT_HALF,
@@ -81700,7 +83980,7 @@ impl GraphOperation for WriteFile {
 }
 
 #[derive(Clone)]
-struct WriteFile {
+pub struct WriteFile {
     filename: Edge<String>,
     contents: Edge<String>,
     op_name: Option<String>,
@@ -81769,6 +84049,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.mkl_y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -81776,7 +84059,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _MklMaximum<T>
+pub struct _MklMaximum<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -81878,6 +84161,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.num_required)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -81885,7 +84171,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseAccumulatorTakeGradient<dtype>
+pub struct SparseAccumulatorTakeGradient<dtype>
 where dtype: TensorType,
       dtype: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
       dtype: 'static,
@@ -81991,6 +84277,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -81998,7 +84287,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FloorMod<T>
+pub struct FloorMod<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16_or_DT_HALF,
@@ -82082,6 +84371,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -82089,7 +84381,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct TruncateMod<T>
+pub struct TruncateMod<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16_or_DT_HALF,
@@ -82199,7 +84491,7 @@ impl GraphOperation for LoadTPUEmbeddingRMSPropParametersGradAccumDebug {
 }
 
 #[derive(Clone)]
-struct LoadTPUEmbeddingRMSPropParametersGradAccumDebug {
+pub struct LoadTPUEmbeddingRMSPropParametersGradAccumDebug {
     parameters: Edge<f32>,
     ms: Edge<f32>,
     mom: Edge<f32>,
@@ -82295,7 +84587,7 @@ impl GraphOperation for ConcatOffset {
 }
 
 #[derive(Clone)]
-struct ConcatOffset {
+pub struct ConcatOffset {
     concat_dim: Edge<i32>,
     shape: Edge<i32>,
     N: i64,
@@ -82369,6 +84661,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -82376,7 +84671,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Igamma<T>
+pub struct Igamma<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -82460,6 +84755,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -82467,7 +84765,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Polygamma<T>
+pub struct Polygamma<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -82547,6 +84845,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -82554,7 +84855,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Identity<T>
+pub struct Identity<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -82633,6 +84934,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -82640,7 +84944,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Atan2<T>
+pub struct Atan2<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
@@ -82735,7 +85039,7 @@ impl GraphOperation for EnqueueTPUEmbeddingIntegerBatch {
 }
 
 #[derive(Clone)]
-struct EnqueueTPUEmbeddingIntegerBatch {
+pub struct EnqueueTPUEmbeddingIntegerBatch {
     batch: Edge<i32>,
     mode_override: Edge<String>,
     N: i64,
@@ -82809,6 +85113,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -82816,7 +85123,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LessEqual<T>
+pub struct LessEqual<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -82900,6 +85207,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -82907,7 +85217,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct GreaterEqual<T>
+pub struct GreaterEqual<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_BFLOAT16_or_DT_UINT16_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -82994,6 +85304,9 @@ where dtype: TensorType,
             new_op.add_edge(&self.flow_in)?
         }
         {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
+        {
             match self.element_shape {
                 None => new_op.set_attr_value_proto("element_shape", &vec![58_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_shape("element_shape", attr)})(&value)?,
@@ -83006,7 +85319,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayGatherV2<dtype>
+pub struct TensorArrayGatherV2<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -83138,6 +85451,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -83145,7 +85461,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Equal<T>
+pub struct Equal<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_COMPLEX64_or_DT_INT64_or_DT_BOOL_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -83229,6 +85545,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -83236,7 +85555,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NotEqual<T>
+pub struct NotEqual<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_STRING_or_DT_COMPLEX64_or_DT_INT64_or_DT_BOOL_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -83321,6 +85640,9 @@ where T: TensorType,
             new_op.add_edge(&self.y)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.tolerance {
                 None => new_op.set_attr_value_proto("tolerance", &vec![37_u8, 172_u8, 197_u8, 39_u8, 55_u8,])?,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("tolerance", *attr)})(&value)?,
@@ -83333,7 +85655,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ApproximateEqual<T>
+pub struct ApproximateEqual<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -83437,6 +85759,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("transpose_b", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -83444,7 +85769,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct MatMul<T>
+pub struct MatMul<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_COMPLEX64_or_DT_INT64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -83554,6 +85879,12 @@ where T: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -83561,7 +85892,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Mean<T, Tidx>
+pub struct Mean<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -83672,6 +86003,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.dimension)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
+        {
+            new_op.set_attr_type("output_type", output_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -83679,7 +86019,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ArgMin<T, Tidx, output_type>
+pub struct ArgMin<T, Tidx, output_type>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -83798,6 +86138,12 @@ where Tinput: TensorType,
         {
             new_op.add_edge(&self.requested_output_max)?
         }
+        {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
+        {
+            new_op.set_attr_type("out_type", out_type::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -83805,7 +86151,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct Requantize<Tinput, out_type>
+pub struct Requantize<Tinput, out_type>
 where Tinput: TensorType,
       Tinput: Clone,
       out_type: TensorType,
@@ -83942,6 +86288,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_segments)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tnumsegments", Tnumsegments::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -83949,7 +86304,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UnsortedSegmentSum<T, Tindices, Tnumsegments>
+pub struct UnsortedSegmentSum<T, Tindices, Tnumsegments>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -84069,6 +86424,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_segments)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tnumsegments", Tnumsegments::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -84076,7 +86440,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UnsortedSegmentMin<T, Tindices, Tnumsegments>
+pub struct UnsortedSegmentMin<T, Tindices, Tnumsegments>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -84196,6 +86560,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_segments)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tindices", Tindices::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tnumsegments", Tnumsegments::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -84203,7 +86576,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct UnsortedSegmentProd<T, Tindices, Tnumsegments>
+pub struct UnsortedSegmentProd<T, Tindices, Tnumsegments>
 where T: TensorType,
       T: Clone,
       Tindices: TensorType,
@@ -84290,6 +86663,7 @@ where T: TensorType,
 impl<S, T> GraphOperation for CudnnRNNParamsSize<S, T>
 where S: TensorType,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
+      T: TensorType,
       T: 'static,
       T: Clone,
       S: con_or_DT_INT32_or_DT_INT64,
@@ -84317,6 +86691,12 @@ where S: TensorType,
         }
         {
             new_op.add_edge(&self.input_size)?
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("S", S::data_type())?;
         }
         {
             match self.rnn_mode {
@@ -84361,9 +86741,10 @@ where S: TensorType,
 }
 
 #[derive(Clone)]
-struct CudnnRNNParamsSize<S, T>
+pub struct CudnnRNNParamsSize<S, T>
 where S: TensorType,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
+      T: TensorType,
       T: 'static,
       T: Clone,
       S: con_or_DT_INT32_or_DT_INT64,
@@ -84388,6 +86769,7 @@ where S: TensorType,
 impl<S, T> CudnnRNNParamsSize<S, T>
 where S: TensorType,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
+      T: TensorType,
       T: 'static,
       T: Clone,
       S: con_or_DT_INT32_or_DT_INT64,
@@ -84515,6 +86897,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.output_dim0)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -84522,7 +86910,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentMeanGrad<T, Tidx>
+pub struct SparseSegmentMeanGrad<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -84630,6 +87018,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.segment_ids)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -84637,7 +87031,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentSqrtN<T, Tidx>
+pub struct SparseSegmentSqrtN<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -84735,6 +87129,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -84742,7 +87139,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Igammac<T>
+pub struct Igammac<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE,
@@ -84840,6 +87237,15 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num_segments)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tnumsegments", Tnumsegments::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -84847,7 +87253,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct SparseSegmentSqrtNWithNumSegments<T, Tidx, Tnumsegments>
+pub struct SparseSegmentSqrtNWithNumSegments<T, Tidx, Tnumsegments>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -84986,6 +87392,9 @@ where T: TensorType,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("beta", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -84993,7 +87402,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LRNGrad<T>
+pub struct LRNGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_BFLOAT16_or_DT_HALF,
@@ -85118,6 +87527,9 @@ where Tidx: TensorType,
                 Some(ref value) => (|attr: &bool| {new_op.set_attr_bool("keep_dims", *attr)})(&value)?,
             };
         }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85125,7 +87537,7 @@ where Tidx: TensorType,
 }
 
 #[derive(Clone)]
-struct Any<Tidx>
+pub struct Any<Tidx>
 where Tidx: TensorType,
       Tidx: Clone,
       Tidx: con_or_DT_INT32_or_DT_INT64,
@@ -85220,6 +87632,9 @@ where Tidx: TensorType,
         {
             new_op.add_edge(&self.delta)?
         }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85227,7 +87642,7 @@ where Tidx: TensorType,
 }
 
 #[derive(Clone)]
-struct Range<Tidx>
+pub struct Range<Tidx>
 where Tidx: TensorType,
       Tidx: Clone,
       Tidx: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_BFLOAT16,
@@ -85333,6 +87748,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.num)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85340,7 +87761,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct LinSpace<T, Tidx>
+pub struct LinSpace<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -85439,6 +87860,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.input)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Tout", Tout::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85446,7 +87873,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Angle<T, Tout>
+pub struct Angle<T, Tout>
 where T: TensorType,
       T: Clone,
       Tout: TensorType,
@@ -85541,6 +87968,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.clip_value_max)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85548,7 +87978,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ClipByValue<T>
+pub struct ClipByValue<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -85642,6 +88072,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.nbins)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85649,7 +88085,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct HistogramFixedWidth<T, dtype>
+pub struct HistogramFixedWidth<T, dtype>
 where T: TensorType,
       T: Clone,
       dtype: TensorType,
@@ -85750,6 +88186,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.weights)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85757,7 +88196,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Bincount<T>
+pub struct Bincount<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64,
@@ -85864,6 +88303,15 @@ where T1: TensorType,
         {
             new_op.add_edge(&self.max_y)?
         }
+        {
+            new_op.set_attr_type("T1", T1::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T2", T2::data_type())?;
+        }
+        {
+            new_op.set_attr_type("Toutput", Toutput::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -85871,7 +88319,7 @@ where T1: TensorType,
 }
 
 #[derive(Clone)]
-struct QuantizedMul<T1, T2, Toutput>
+pub struct QuantizedMul<T1, T2, Toutput>
 where T1: TensorType,
       T1: Clone,
       T2: TensorType,
@@ -86014,6 +88462,9 @@ where Tinput: TensorType,
         {
             new_op.add_edge(&self.input_max)?
         }
+        {
+            new_op.set_attr_type("Tinput", Tinput::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -86021,7 +88472,7 @@ where Tinput: TensorType,
 }
 
 #[derive(Clone)]
-struct RequantizationRange<Tinput>
+pub struct RequantizationRange<Tinput>
 where Tinput: TensorType,
       Tinput: Clone,
       Tinput: con_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_QINT16_or_DT_QUINT16,
@@ -86131,7 +88582,7 @@ impl GraphOperation for RegexReplace {
 }
 
 #[derive(Clone)]
-struct RegexReplace {
+pub struct RegexReplace {
     input: Edge<String>,
     pattern: Edge<String>,
     rewrite: Edge<String>,
@@ -86214,6 +88665,9 @@ where T: TensorType,
             (|attr| {new_op.set_attr_string("reduction", attr)})(&self.reduction)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_devices", *attr)})(&self.num_devices)?
         }
         {
@@ -86226,7 +88680,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NcclAllReduce<T>
+pub struct NcclAllReduce<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -86315,7 +88769,7 @@ impl GraphOperation for QueueSize {
 }
 
 #[derive(Clone)]
-struct QueueSize {
+pub struct QueueSize {
     handle: Edge<String>,
     op_name: Option<String>,
     id_: usize,
@@ -86381,6 +88835,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.data_format {
                 None => new_op.set_attr_value_proto("data_format", &vec![18_u8, 4_u8, 78_u8, 72_u8, 87_u8, 67_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("data_format", attr)})(&value)?,
@@ -86393,7 +88850,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BiasAddGrad<T>
+pub struct BiasAddGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -86483,6 +88940,9 @@ where T: TensorType,
             (|attr| {new_op.set_attr_string("reduction", attr)})(&self.reduction)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_devices", *attr)})(&self.num_devices)?
         }
         let op = new_op.finish()?;
@@ -86492,7 +88952,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct NcclReduce<T>
+pub struct NcclReduce<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -86580,6 +89040,9 @@ where T: TensorType,
             (|attr| {new_op.set_attr_string("reduction", attr)})(&self.reduction)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_devices", *attr)})(&self.num_devices)?
         }
         {
@@ -86592,7 +89055,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _NcclReduceSend<T>
+pub struct _NcclReduceSend<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -86682,7 +89145,7 @@ impl GraphOperation for SdcaShrinkL1 {
 }
 
 #[derive(Clone)]
-struct SdcaShrinkL1 {
+pub struct SdcaShrinkL1 {
     weights: Edge<f32>,
     num_features: i64,
     l1: f32,
@@ -86751,6 +89214,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.y)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -86758,7 +89224,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BitwiseAnd<T>
+pub struct BitwiseAnd<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_INT64_or_DT_UINT16_or_DT_UINT32_or_DT_UINT64,
@@ -86843,6 +89309,9 @@ where T: TensorType,
             (|attr| {new_op.set_attr_string("reduction", attr)})(&self.reduction)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_devices", *attr)})(&self.num_devices)?
         }
         {
@@ -86855,7 +89324,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _NcclReduceRecv<T>
+pub struct _NcclReduceRecv<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -86943,6 +89412,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_devices", *attr)})(&self.num_devices)?
         }
         {
@@ -86955,7 +89427,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _NcclBroadcastSend<T>
+pub struct _NcclBroadcastSend<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
@@ -87032,6 +89504,9 @@ where T: TensorType,
             new_op.add_edge(&self.shape)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &i64| {new_op.set_attr_int("num_devices", *attr)})(&self.num_devices)?
         }
         {
@@ -87044,7 +89519,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct _NcclBroadcastRecv<T>
+pub struct _NcclBroadcastRecv<T>
 where T: TensorType,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_INT64_or_DT_HALF,
       T: 'static,
@@ -87127,7 +89602,7 @@ impl GraphOperation for ControlTrigger {
 }
 
 #[derive(Clone)]
-struct ControlTrigger {
+pub struct ControlTrigger {
     op_name: Option<String>,
     id_: usize,
 }
@@ -87186,6 +89661,9 @@ where dtype: TensorType,
         {
             new_op.add_edge(&self.flow_in)?
         }
+        {
+            new_op.set_attr_type("dtype", dtype::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -87193,7 +89671,7 @@ where dtype: TensorType,
 }
 
 #[derive(Clone)]
-struct TensorArrayReadV2<dtype>
+pub struct TensorArrayReadV2<dtype>
 where dtype: TensorType,
       dtype: 'static,
       dtype: Clone,
@@ -87288,6 +89766,9 @@ where T: TensorType,
             new_op.add_edge(&self.gamma)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr: &f32| {new_op.set_attr_float("variance_epsilon", *attr)})(&self.variance_epsilon)?
         }
         {
@@ -87300,7 +89781,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BatchNormWithGlobalNormalization<T>
+pub struct BatchNormWithGlobalNormalization<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -87409,6 +89890,9 @@ where T: TensorType,
             new_op.add_edge(&self.variance)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.epsilon {
                 None => new_op.set_attr_value_proto("epsilon", &vec![37_u8, 23_u8, 183_u8, 209_u8, 56_u8,])?,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("epsilon", *attr)})(&value)?,
@@ -87433,7 +89917,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FusedBatchNorm<T>
+pub struct FusedBatchNorm<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT,
@@ -87589,6 +90073,9 @@ where T: TensorType,
             new_op.add_edge(&self.input)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.device_name {
                 None => new_op.set_attr_value_proto("device_name", &vec![18_u8, 0_u8,])?,
                 Some(ref value) => (|attr| {new_op.set_attr_string("device_name", attr)})(&value)?,
@@ -87619,7 +90106,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DebugIdentity<T>
+pub struct DebugIdentity<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -87744,6 +90231,12 @@ where T: TensorType,
             new_op.add_edge(&self.variance)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
+            new_op.set_attr_type("U", U::data_type())?;
+        }
+        {
             match self.epsilon {
                 None => new_op.set_attr_value_proto("epsilon", &vec![37_u8, 23_u8, 183_u8, 209_u8, 56_u8,])?,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("epsilon", *attr)})(&value)?,
@@ -87768,7 +90261,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FusedBatchNormV2<T, U>
+pub struct FusedBatchNormV2<T, U>
 where T: TensorType,
       T: Clone,
       U: TensorType,
@@ -87935,6 +90428,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.x)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -87942,7 +90438,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Cos<T>
+pub struct Cos<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_COMPLEX64_or_DT_BFLOAT16_or_DT_COMPLEX128_or_DT_HALF,
@@ -88033,6 +90529,9 @@ where T: TensorType,
             new_op.add_edge(&self.reserve_space_2)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             match self.epsilon {
                 None => new_op.set_attr_value_proto("epsilon", &vec![37_u8, 23_u8, 183_u8, 209_u8, 56_u8,])?,
                 Some(ref value) => (|attr: &f32| {new_op.set_attr_float("epsilon", *attr)})(&value)?,
@@ -88057,7 +90556,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FusedBatchNormGrad<T>
+pub struct FusedBatchNormGrad<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT,
@@ -88262,6 +90761,12 @@ where T: TensorType,
         {
             new_op.add_edge(&self.axis)?
         }
+        {
+            new_op.set_attr_type("Tidx", Tidx::data_type())?;
+        }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -88269,7 +90774,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct ReverseV2<T, Tidx>
+pub struct ReverseV2<T, Tidx>
 where T: TensorType,
       T: Clone,
       Tidx: TensorType,
@@ -88364,6 +90869,9 @@ where T: TensorType,
         {
             new_op.add_edge(&self.bias)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -88371,7 +90879,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct BiasAddV1<T>
+pub struct BiasAddV1<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_INT32_or_DT_UINT8_or_DT_INT16_or_DT_INT8_or_DT_COMPLEX64_or_DT_INT64_or_DT_QINT8_or_DT_QUINT8_or_DT_QINT32_or_DT_BFLOAT16_or_DT_UINT16_or_DT_COMPLEX128_or_DT_HALF_or_DT_UINT32_or_DT_UINT64,
@@ -88459,6 +90967,9 @@ where T: TensorType,
             new_op.add_edge(&self.filter)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attr| {new_op.set_attr_string("mode", attr)})(&self.mode)?
         }
         {
@@ -88474,7 +90985,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct FusedPadConv2D<T>
+pub struct FusedPadConv2D<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_HALF,
@@ -88572,6 +91083,9 @@ where T: TensorType,
         {
             (|attr: &i64| {new_op.set_attr_int("N", *attr)})(&self.N)?
         }
+        {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
         let op = new_op.finish()?;
         graph.record_op(self.get_id(), op.clone());
         Ok(op)
@@ -88579,7 +91093,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct DynamicStitch<T>
+pub struct DynamicStitch<T>
 where T: TensorType,
       T: Clone,
       T: 'static,
@@ -88668,6 +91182,9 @@ where T: TensorType,
             new_op.add_edge(&self.out_backprop)?
         }
         {
+            new_op.set_attr_type("T", T::data_type())?;
+        }
+        {
             (|attrs| {new_op.set_attr_int_list("strides", attrs)})(&self.strides)?
         }
         {
@@ -88698,7 +91215,7 @@ where T: TensorType,
 }
 
 #[derive(Clone)]
-struct Conv2DBackpropInput<T>
+pub struct Conv2DBackpropInput<T>
 where T: TensorType,
       T: Clone,
       T: con_or_DT_FLOAT_or_DT_DOUBLE_or_DT_BFLOAT16_or_DT_HALF,
