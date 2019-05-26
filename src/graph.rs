@@ -23,6 +23,10 @@ use std::ptr;
 use std::slice;
 use std::str::Utf8Error;
 use std::sync::Arc;
+use std::rc::Rc;
+use std::marker::PhantomData;
+use std::mem::swap;
+use std::collections::HashMap;
 use tensorflow_sys as tf;
 
 #[derive(Debug)]
@@ -210,6 +214,7 @@ impl ImportGraphDefResults {
                     operation: Operation {
                         inner: output.oper,
                         gimpl: self.gimpl.clone(),
+                        tensors: Vec::new(),
                     },
                     index: output.index,
                 })
@@ -232,6 +237,7 @@ impl ImportGraphDefResults {
                 .map(|operation| Operation {
                     inner: *operation,
                     gimpl: self.gimpl.clone(),
+                    tensors: Vec::new(),
                 })
                 .collect()
         }
@@ -275,6 +281,7 @@ impl_drop!(ImportGraphDefResults, TF_DeleteImportGraphDefResults);
 pub struct Graph {
     gimpl: Arc<GraphImpl>,
     lifetime: GraphLifetime,
+    ops: HashMap<usize, Operation>,
 }
 
 impl Graph {
@@ -287,6 +294,7 @@ impl Graph {
                     owned: true,
                 }),
                 lifetime: GraphLifetime,
+                ops: HashMap::new(),
             }
         }
     }
@@ -308,6 +316,7 @@ impl Graph {
                                            c_operation_name.as_ptr()),
                 graph: self,
                 finished: false,
+                tensors: Vec::new(),
             })
         }
     }
@@ -327,6 +336,7 @@ impl Graph {
                 Ok(Some(Operation {
                     inner: operation,
                     gimpl: self.gimpl.clone(),
+                    tensors: Vec::new(),
                 }))
             }
         }
@@ -370,6 +380,20 @@ impl Graph {
             }
             i += 1;
         }
+    }
+
+    pub(crate) fn new_op_name(&self, operation_name_pattern: &str) -> Result<String> {
+        let i = self.generate_operation_name(operation_name_pattern)?;
+        let parts: Vec<_> = operation_name_pattern.split("{}").collect();
+        Ok(format!("{}{}{}", parts[0], i, parts[1]))
+    }
+
+    pub(crate) fn record_op(&mut self, id: usize, op: Operation) {
+        self.ops.insert(id, op);
+    }
+
+    pub(crate) fn get_op_by_id(&self, id: usize) -> Option<Operation> {
+        Some(self.ops.get(&id)?.clone())
     }
 
     /// Iterates over the operations in the graph.
@@ -840,6 +864,7 @@ impl Graph {
                 owned: false,
             }),
             lifetime: GraphLifetime,
+            ops: HashMap::new(),
         }
     }
 }
@@ -867,6 +892,7 @@ impl<'a> Iterator for OperationIter<'a> {
                 Some(Operation {
                     inner: operation,
                     gimpl: self.graph.gimpl.clone(),
+                    tensors: Vec::new(),
                 })
             }
         }
@@ -938,10 +964,11 @@ impl AttrMetadata {
 
 /// An `Operation` is a node in a `Graph`.
 /// It is a computation which accepts inputs and produces outputs.
-#[derive(Debug,Clone)]
+#[derive(Debug, Clone)]
 pub struct Operation {
     inner: *mut tf::TF_Operation,
     gimpl: Arc<GraphImpl>,
+    tensors: Vec<Rc<dyn AnyTensor>>,
 }
 
 unsafe impl Send for Operation {}
@@ -1047,6 +1074,7 @@ impl Operation {
             (Operation {
                  inner: port.oper,
                  gimpl: self.gimpl.clone(),
+                 tensors: Vec::new(),
              },
              port.index as usize)
         }
@@ -1085,6 +1113,7 @@ impl Operation {
                     (Operation {
                          inner: port.oper,
                          gimpl: self.gimpl.clone(),
+                         tensors: Vec::new(),
                      },
                      port.index as usize)
                 })
@@ -1111,6 +1140,7 @@ impl Operation {
                     Operation {
                         inner: operation,
                         gimpl: self.gimpl.clone(),
+                        tensors: Vec::new(),
                     }
                 })
                 .collect()
@@ -1136,6 +1166,7 @@ impl Operation {
                     Operation {
                         inner: operation,
                         gimpl: self.gimpl.clone(),
+                        tensors: Vec::new(),
                     }
                 })
                 .collect()
@@ -1670,6 +1701,7 @@ impl Output {
             operation: Operation {
                 inner: output.oper,
                 gimpl: graph.gimpl.clone(),
+                tensors: Vec::new(),
             },
             index: output.index,
         }
@@ -1683,6 +1715,7 @@ impl Output {
                 operation: Operation {
                     inner: output.oper,
                     gimpl: graph.gimpl.clone(),
+                    tensors: Vec::new(),
                 },
                 index: output.index,
             })
@@ -1703,8 +1736,9 @@ pub struct OperationDescription<'a> {
     inner: *mut tf::TF_OperationDescription,
     // This keeps self from outliving the Graph, which is required by
     // the docs on TF_NewOperation.
-    graph: &'a Graph,
+    graph: &'a mut Graph,
     finished: bool,
+    tensors: Vec<Rc<dyn AnyTensor>>,
 }
 
 impl<'a> Drop for OperationDescription<'a> {
@@ -1729,10 +1763,14 @@ impl<'a> OperationDescription<'a> {
         let mut status = Status::new();
         let operation = unsafe { tf::TF_FinishOperation(self.inner, status.inner()) };
         if status.is_ok() {
-            Ok(Operation {
+            let mut new_op = Operation {
                 inner: operation,
                 gimpl: self.graph.gimpl.clone(),
-            })
+                tensors: Vec::new(),
+            };
+
+            swap(&mut new_op.tensors, &mut self.tensors);
+            Ok(new_op)
         } else {
             Err(status)
         }
@@ -1757,6 +1795,11 @@ impl<'a> OperationDescription<'a> {
         }
     }
 
+    pub(crate) fn add_edge<T: TensorType>(&mut self, edge: &Edge<T>) -> Result<()> {
+        let output = edge.output(&mut self.graph)?;
+        Ok(self.add_input(output))
+    }
+
     /// Adds multiple inputs to this operation.
     ///
     /// The index in the ports is an index into the source operation's output array.
@@ -1765,6 +1808,14 @@ impl<'a> OperationDescription<'a> {
         unsafe {
             tf::TF_AddInputList(self.inner, c_inputs.as_ptr(), c_inputs.len() as c_int);
         }
+    }
+
+    pub(crate) fn add_edge_list<T: TensorType>(&mut self, edge: &[Edge<T>]) -> Result<()> {
+        let output_list: Result<Vec<Output>> = edge.into_iter()
+                                                   .map(|edge| {edge.output(&mut self.graph)})
+                                                   .collect();
+        self.add_input_list(&output_list?);
+        Ok(())
     }
 
     /// Adds a control input.
@@ -2048,9 +2099,9 @@ impl<'a> OperationDescription<'a> {
     }
 
     /// Sets a tensor-valued attribute.
-    pub fn set_attr_tensor<T: TensorType>(&mut self,
+    pub fn set_attr_tensor<T: AnyTensor>(&mut self,
                                           attr_name: &str,
-                                          value: Tensor<T>)
+                                          value: T)
                                           -> Result<()> {
         let c_attr_name = CString::new(attr_name)?;
         let mut status = Status::new();
@@ -2069,8 +2120,8 @@ impl<'a> OperationDescription<'a> {
         attr_name: &str,
         value: I
         ) -> Result<()> 
-        where I: IntoIterator<Item = Tensor<T>>, 
-            T: TensorType 
+        where I: IntoIterator<Item = T>, 
+            T: AnyTensor
     {
         let c_attr_name = CString::new(attr_name)?;
         let mut status = Status::new();
@@ -2086,6 +2137,22 @@ impl<'a> OperationDescription<'a> {
                                      status.inner());
         }
         status.into_result()
+    }
+
+    pub fn set_attr_tensor_owned(&mut self,
+                                 attr_name: &str,
+                                 value: Rc<dyn AnyTensor>) -> Result<()> {
+        self.set_attr_tensor(attr_name, &value)?;
+        self.tensors.push(value);
+        Ok(())
+    }
+
+    pub fn set_attr_tensor_list_owned(&mut self,
+                                      attr_name: &str,
+                                      value: Vec<Rc<dyn AnyTensor>>) -> Result<()> {
+        self.set_attr_tensor_list(attr_name, &value)?;
+        self.tensors.extend(value);
+        Ok(())
     }
 
     /// Sets an attribute with an `AttrValue` proto.
@@ -2217,6 +2284,36 @@ impl Function {
                 .to_str()
                 .map(|s| s.to_string())
         }
+    }
+}
+
+
+pub trait GraphOperation {
+    fn tf_operation(&self, graph: &mut Graph) -> Result<Operation>;
+    fn get_id(&self) -> usize;
+}
+
+#[derive(Clone)]
+pub struct Edge<T: TensorType> {
+    parent: Rc<dyn GraphOperation>,
+    port: c_int,
+    phantom: PhantomData<T>,
+}
+
+impl<T: TensorType> Edge<T> {
+    pub(crate) fn new(parent: Rc<dyn GraphOperation>, port: c_int) -> Self {
+        Self {
+            parent,
+            port,
+            phantom: PhantomData,
+        }
+    }
+
+    pub(crate) fn output(&self, graph: &mut Graph) -> Result<Output> {
+        Ok(Output {
+            operation: self.parent.tf_operation(graph)?,
+            index: self.port,
+        })
     }
 }
 

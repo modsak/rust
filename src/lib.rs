@@ -37,9 +37,28 @@ use std::os::raw::c_char;
 use std::ptr;
 use std::slice;
 use std::str::Utf8Error;
+use std::sync::Mutex;
+use std::rc::Rc;
+
 use tensorflow_sys as tf;
 
+#[macro_use]
+use lazy_static::lazy_static;
+
+
 ////////////////////////
+
+lazy_static! {
+  static ref current_op_id: Mutex<Cell<usize>> = Mutex::new(Cell::new(0));
+}
+
+pub fn new_id() -> usize{
+  let locked_id = current_op_id.lock().unwrap();
+  let id = locked_id.get() + 1;
+  locked_id.set(id);
+  id
+}
+
 
 /// Will panic if `msg` contains an embedded 0 byte.
 macro_rules! invalid_arg {
@@ -172,6 +191,10 @@ pub use crate::session::*;
 pub mod expr;
 
 pub mod io;
+
+pub mod ops;
+
+mod test_ops;
 
 ////////////////////////
 
@@ -794,7 +817,7 @@ impl TensorType for String {
 
 ////////////////////////
 
-trait AnyTensor: Debug {
+pub trait AnyTensor: Debug {
     fn inner(&self) -> Result<*mut tf::TF_Tensor>;
 }
 
@@ -1179,6 +1202,30 @@ impl<T: TensorType> Deref for Tensor<T> {
     }
 }
 
+impl AnyTensor for Box<dyn AnyTensor> {
+    fn inner(&self) -> Result<*mut tf::TF_Tensor> {
+        (**self).inner()   
+    }
+}
+
+impl AnyTensor for &Box<dyn AnyTensor> {
+    fn inner(&self) -> Result<*mut tf::TF_Tensor> {
+        (***self).inner()   
+    }
+}
+
+impl AnyTensor for Rc<dyn AnyTensor> {
+    fn inner(&self) -> Result<*mut tf::TF_Tensor> {
+        (**self).inner()   
+    }
+}
+
+impl AnyTensor for &Rc<dyn AnyTensor> {
+    fn inner(&self) -> Result<*mut tf::TF_Tensor> {
+        (***self).inner()   
+    }
+}
+
 impl<T: TensorType> DerefMut for Tensor<T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut [T] {
@@ -1201,6 +1248,13 @@ impl<'a, T: TensorType> From<&'a [T]> for Tensor<T> {
             e.clone_from(v);
         }
         tensor
+    }
+}
+
+impl<T: TensorType> From<Vec<T>> for Tensor<T> {
+    fn from(value: Vec<T>) -> Self {
+        let s: &[T] = value.as_ref();
+        s.into()
     }
 }
 
@@ -1369,6 +1423,7 @@ mod while_loop;
 pub use crate::while_loop::*;
 
 ////////////////////////
+
 
 #[cfg(test)]
 mod tests {

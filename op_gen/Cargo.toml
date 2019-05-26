@@ -1,0 +1,11 @@
+[package]
+name = "op_gen"
+version = "0.1.0"
+authors = ["Josh Kurland <joshua.kurland@outlook.com>"]
+edition = "2018"
+
+[dependencies]
+tensorflow-sys = { version = "0.16.0", path = "../tensorflow-sys" }
+tensorflow-protos = { version = "0.1.0", path = "../tensorflow-protos"}
+codegen = "0.1.1"
+protobuf = "2.5.0"

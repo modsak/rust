@@ -9,6 +9,7 @@ use super::SessionOptions;
 use super::Status;
 use super::Tensor;
 use super::TensorType;
+use super::Edge;
 use crate::tf;
 use libc::{c_char, c_int};
 use std::ffi::CStr;
@@ -168,6 +169,14 @@ impl Session {
                               status.inner());
         };
         status.into_result()
+    }
+
+    pub fn fetch<T: TensorType>(&self, graph: &mut Graph, edge: &Edge<T>) -> Result<Tensor<T>> {
+        let mut args = SessionRunArgs::new();
+        let output = edge.output(graph)?;
+        let token = args.request_fetch(&output.operation, output.index);
+        self.run(&mut args)?;
+        args.fetch(token)
     }
 
     /// Lists all devices in a session.
