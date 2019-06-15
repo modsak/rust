@@ -11,13 +11,18 @@ use super::Tensor;
 use super::TensorType;
 use super::Output;
 use super::Edge;
+use super::GraphEdge;
+use super::GraphOperation;
 use crate::tf;
 use libc::{c_char, c_int};
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::marker;
+use std::marker::PhantomData;
 use std::path::Path;
 use std::ptr;
+use std::ops;
+
 
 /// Aggregation type for a saved model bundle.
 #[derive(Debug)]
@@ -148,7 +153,7 @@ impl Session {
     /// requested in the step.  Note that the session has interior mutability;
     /// this may mutate variables in the graph, and the caller is responsible
     /// for handling race conditions.
-    pub fn run(&self, step: &mut SessionRunArgs<'_>) -> Result<()> {
+    pub fn run(&self, step: &mut SessionRunArgs) -> Result<()> {
         // In case we're running it a second time and not all outputs were taken out.
         step.drop_output_tensors();
 
@@ -172,7 +177,7 @@ impl Session {
         status.into_result()
     }
 
-    pub fn fetch<T: TensorType>(&self, graph: &mut Graph, edge: &Edge<T>) -> Result<Tensor<T>> {
+    pub fn fetch<T: TensorType, U: GraphEdge<T>>(&self, graph: &mut Graph, edge: &U) -> Result<Tensor<T>> {
         let mut args = SessionRunArgs::new();
         let output = edge.output(graph)?;
         let token = args.request_fetch(&output.operation, output.index);
@@ -239,6 +244,79 @@ unsafe impl Sync for Session {}
 
 ////////////////////////
 
+pub struct Token<T: TensorType> {
+    index: usize,
+    phantom: PhantomData<T>
+}
+
+impl<T: TensorType> Token<T> {
+    fn new(index: usize) -> Self {
+        Self {
+            index,
+            phantom: PhantomData,
+        }
+    }
+}
+
+impl<T: TensorType> From<FetchToken> for Token<T> {
+    fn from(token: FetchToken) -> Self {
+        Self::new(token.index)
+    }
+}
+
+
+pub struct SessionRun<'a> {
+    graph: &'a mut Graph,
+    args: SessionRunArgs,
+}
+
+impl<'a> SessionRun<'a> {
+    pub fn new(graph: &'a mut Graph) -> Self {
+        Self {
+            graph,
+            args: SessionRunArgs::new(),
+        }
+    }
+
+    pub fn add_edge<T: TensorType, U: GraphEdge<T>>(&mut self, edge: &U) -> Result<Token<T>> {
+        let output = edge.output(self.graph)?;
+        Ok(self.args.request_out(&output).into())
+    }
+
+    pub fn add_op<U: GraphOperation>(&mut self, edge: &U) -> Result<()> {
+        let operation = edge.tf_operation(&mut self.graph)?;
+        self.args.add_target(&operation);
+        Ok(())
+    }
+
+    pub fn add_feed<T: TensorType, U: GraphEdge<T>>(&mut self, edge: &U, value: Tensor<T>) -> Result<()> {
+        let output = edge.output(&mut self.graph)?;
+        self.args.add_feed(&output.operation, output.index, value);
+        Ok(())
+    }
+
+    pub fn run(mut self, sess: &Session) -> Result<SessionResult> {
+        sess.run(&mut self.args)?;
+        Ok(SessionResult::new(self.args))
+    }
+}
+
+pub struct SessionResult {
+    args: SessionRunArgs,
+}
+
+impl SessionResult {
+    fn new(args: SessionRunArgs) -> Self {
+        Self {
+            args,
+        }
+    }
+
+    pub fn get<T: TensorType>(&mut self, token: Token<T>) -> Result<Tensor<T>> {
+        self.args.fetch(FetchToken{index: token.index})
+    }
+}
+
 /// An opaque token for retrieving an output from a computation.
 #[derive(Copy,Clone,Debug)]
 pub struct FetchToken {
@@ -259,8 +337,8 @@ pub type OutputToken = FetchToken;
 ///
 /// ```rust,ignore
 /// let mut args = SessionRunArgs::new();
-/// args.add_feed(&op1, 0, &tensor1);
-/// args.add_feed(&op2, 0, &tensor2);
+/// args.add_feed(&op1, 0, tensor1);
+/// args.add_feed(&op2, 0, tensor2);
 /// let result_token = args.request_fetch(&op3, 0);
 /// session.run(&mut args)?;
 /// let result_tensor = args.fetch(result_token)?;
@@ -268,19 +346,17 @@ pub type OutputToken = FetchToken;
 ///
 /// See examples/addition.rs for a more concrete example.
 #[derive(Debug)]
-pub struct SessionRunArgs<'l> {
+pub struct SessionRunArgs {
     input_ports: Vec<tf::TF_Output>,
-    input_tensors: Vec<&'l dyn AnyTensor>,
+    input_tensors: Vec<Box<dyn AnyTensor>>,
 
     output_ports: Vec<tf::TF_Output>,
     output_tensors: Vec<*mut tf::TF_Tensor>,
 
     target_operations: Vec<*const tf::TF_Operation>,
-
-    phantom: marker::PhantomData<&'l ()>,
 }
 
-impl<'l> SessionRunArgs<'l> {
+impl SessionRunArgs {
     /// Creates a SessionRunArgs.
     pub fn new() -> Self {
         SessionRunArgs {
@@ -291,8 +367,6 @@ impl<'l> SessionRunArgs<'l> {
             output_tensors: vec![],
 
             target_operations: vec![],
-
-            phantom: marker::PhantomData,
         }
     }
 
@@ -302,12 +376,12 @@ impl<'l> SessionRunArgs<'l> {
     pub fn add_feed<T: TensorType>(&mut self,
                                    operation: &Operation,
                                    index: c_int,
-                                   tensor: &'l Tensor<T>) {
+                                   tensor: Tensor<T>) {
         self.input_ports.push(tf::TF_Output {
                                   oper: operation.inner(),
                                   index: index,
                               });
-        self.input_tensors.push(tensor);
+        self.input_tensors.push(Box::new(tensor));
     }
 
     /// Deprecated alias for add_feed.
@@ -315,7 +389,7 @@ impl<'l> SessionRunArgs<'l> {
     pub fn add_input<T: TensorType>(&mut self,
                                     operation: &Operation,
                                     index: c_int,
-                                    tensor: &'l Tensor<T>) {
+                                    tensor: Tensor<T>) {
         self.add_feed(operation, index, tensor)
     }
 
@@ -334,7 +408,7 @@ impl<'l> SessionRunArgs<'l> {
     }
 
     /// Wrapper around request_fetch for outputs
-    pub fn request_out<T: TensorType>(&mut self, output: &Output) -> FetchToken {
+    pub fn request_out(&mut self, output: &Output) -> FetchToken {
         self.request_fetch(&output.operation, output.index)
     }
 
@@ -414,7 +488,7 @@ impl<'l> SessionRunArgs<'l> {
     }
 }
 
-impl<'l> Drop for SessionRunArgs<'l> {
+impl Drop for SessionRunArgs {
     fn drop(&mut self) {
         self.drop_output_tensors();
     }
@@ -422,7 +496,7 @@ impl<'l> Drop for SessionRunArgs<'l> {
 
 /// Deprecated alias for SessionRunArgs.
 #[deprecated(note="Use SessionRunArgs instead.", since="0.10.0")]
-pub type StepWithGraph<'l> = SessionRunArgs<'l>;
+pub type StepWithGraph = SessionRunArgs;
 
 ////////////////////////
 
@@ -502,7 +576,7 @@ mod tests {
         x[0] = 2.0;
         x[1] = 3.0;
         let mut step = SessionRunArgs::new();
-        step.add_feed(&x_operation, 0, &x);
+        step.add_feed(&x_operation, 0, x);
         let output_token = step.request_fetch(&y_operation, 0);
         session.run(&mut step).unwrap();
         let output_tensor = step.fetch::<f32>(output_token).unwrap();
@@ -538,8 +612,8 @@ mod tests {
         let mut y = <Tensor<f32>>::new(&[1]);
         y[0] = 4.0;
         let mut step = SessionRunArgs::new();
-        step.add_feed(&x_op, 0, &x);
-        step.add_feed(&y_op, 0, &y);
+        step.add_feed(&x_op, 0, x);
+        step.add_feed(&y_op, 0, y);
         let output_token = step.request_fetch(&y_hat_op, 0);
         session.run(&mut step).unwrap();
         let output_tensor = step.fetch::<f32>(output_token).unwrap();

@@ -78,8 +78,8 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     // Train the model.
     let mut train_step = SessionRunArgs::new();
-    train_step.add_feed(&op_x, 0, &x);
-    train_step.add_feed(&op_y, 0, &y);
+    train_step.add_feed(&op_x, 0, x);
+    train_step.add_feed(&op_y, 0, y);
     train_step.add_target(&op_train);
     for _ in 0..steps {
         session.run(&mut train_step)?;
@@ -87,7 +87,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     // Save the model.
     let mut step = SessionRunArgs::new();
-    step.add_feed(&op_file_path, 0, &file_path_tensor);
+    step.add_feed(&op_file_path, 0, file_path_tensor.clone());
     step.add_target(&op_save);
     session.run(&mut step)?;
 
@@ -97,7 +97,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     // Load the model.
     let op_load = graph.operation_by_name_required("save/restore_all")?;
     let mut step = SessionRunArgs::new();
-    step.add_feed(&op_file_path, 0, &file_path_tensor);
+    step.add_feed(&op_file_path, 0, file_path_tensor);
     step.add_target(&op_load);
     session.run(&mut step)?;
 

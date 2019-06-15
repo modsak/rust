@@ -27,6 +27,7 @@ use std::rc::Rc;
 use std::marker::PhantomData;
 use std::mem::swap;
 use std::collections::HashMap;
+use std::convert::TryFrom;
 use tensorflow_sys as tf;
 
 #[derive(Debug)]
@@ -1795,7 +1796,7 @@ impl<'a> OperationDescription<'a> {
         }
     }
 
-    pub(crate) fn add_edge<T: TensorType>(&mut self, edge: &Edge<T>) -> Result<()> {
+    pub(crate) fn add_edge<U: TensorType, T: GraphEdge<U>>(&mut self, edge: &T) -> Result<()> {
         let output = edge.output(&mut self.graph)?;
         Ok(self.add_input(output))
     }
@@ -1810,7 +1811,7 @@ impl<'a> OperationDescription<'a> {
         }
     }
 
-    pub(crate) fn add_edge_list<T: TensorType>(&mut self, edge: &[Edge<T>]) -> Result<()> {
+    pub(crate) fn add_edge_list<U: TensorType, T: GraphEdge<U>>(&mut self, edge: &[T]) -> Result<()> {
         let output_list: Result<Vec<Output>> = edge.into_iter()
                                                    .map(|edge| {edge.output(&mut self.graph)})
                                                    .collect();
@@ -2290,8 +2291,16 @@ impl Function {
 
 pub trait GraphOperation {
     fn tf_operation(&self, graph: &mut Graph) -> Result<Operation>;
-    fn get_id(&self) -> usize;
+    // fn get_id(&self) -> usize;
 }
+
+pub trait GraphEdge<T: TensorType> {
+    fn output(&self, graph: &mut Graph) -> Result<Output>;
+    fn operation(&self, graph: &mut Graph) -> Result<Operation>;
+    fn box_clone(&self) -> Box<dyn GraphEdge<T>>;
+}
+
+pub trait GraphRefEdge<T: TensorType>: GraphEdge<T> {}
 
 #[derive(Clone)]
 pub struct Edge<T: TensorType> {
@@ -2308,14 +2317,68 @@ impl<T: TensorType> Edge<T> {
             phantom: PhantomData,
         }
     }
+}
 
-    pub(crate) fn output(&self, graph: &mut Graph) -> Result<Output> {
+impl<T: TensorType> GraphEdge<T> for Edge<T> {
+
+    fn output(&self, graph: &mut Graph) -> Result<Output> {
         Ok(Output {
             operation: self.parent.tf_operation(graph)?,
             index: self.port,
         })
     }
+
+    fn operation(&self, graph: &mut Graph) -> Result<Operation> {
+        Ok(self.parent.tf_operation(graph)?)
+    }
+
+    fn box_clone(&self) -> Box<dyn GraphEdge<T>> {
+        Box::new(self.clone())
+    }
 }
+
+impl<T: TensorType> GraphOperation for Edge<T> {
+    fn tf_operation(&self, graph: &mut Graph) -> Result<Operation> {
+        self.operation(graph)
+    }
+}
+
+#[derive(Clone)]
+pub struct RefEdge<T: TensorType> {
+    edge: Edge<T>,
+}
+
+impl<T: TensorType> RefEdge<T> {
+    pub(crate) fn new(parent: Rc<dyn GraphOperation>, port: c_int) -> Self {
+        Self {
+            edge: Edge::<T>::new(parent, port),
+        }
+    }
+
+}
+
+impl<T: TensorType> GraphEdge<T> for RefEdge<T> {
+
+    fn output(&self, graph: &mut Graph) -> Result<Output> {
+        self.edge.output(graph)
+    }
+
+    fn operation(&self, graph: &mut Graph) -> Result<Operation> {
+        self.edge.operation(graph)
+    }
+
+    fn box_clone(&self) -> Box<dyn GraphEdge<T>> {
+        Box::new(self.clone())
+    }
+}
+
+impl<T: TensorType> GraphOperation for RefEdge<T> {
+    fn tf_operation(&self, graph: &mut Graph) -> Result<Operation> {
+        self.operation(graph)
+    }
+}
+
+impl<T: TensorType> GraphRefEdge<T> for RefEdge<T> {}
 
 ////////////////////////
 

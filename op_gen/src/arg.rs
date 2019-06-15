@@ -52,9 +52,16 @@ impl AddToImpl for GenericInputArg {
         impl_.bound(&ty, "TensorType");
         impl_.bound(&ty, "Clone");
         impl_.phantom(&ty);
-        impl_.builder.new_fn_arg(&self.arg.name()?, &self.arg.edge_type()?.into());
+
+        let arg_generic = format!("{}_Arg", self.arg.name()?);
+        impl_.generic(&arg_generic);
+        impl_.bound(&arg_generic, "Clone");
+        impl_.bound(&arg_generic, &self.arg.arg_bound()?);
+        impl_.bound(&arg_generic, "'static");
+
+        impl_.builder.new_fn_arg(&self.arg.name()?, &cg::Type::new(&arg_generic));
         impl_.builder.make_self.line(&format!("{},", self.arg.name()?));
-        impl_.builder.struct_.field(&self.arg.name()?, &self.arg.edge_type()?);
+        impl_.builder.struct_.field(&self.arg.name()?, &arg_generic);
 
         let mut setup = cg::Block::new("");
         setup.line(&format!("new_op.add_edge(&self.{})?", &self.arg.name()?));
@@ -78,9 +85,15 @@ impl ConcreteInputArg {
 
 impl AddToImpl for ConcreteInputArg {
     fn add_to_impl(&self, impl_: &mut OpImpl, lib: &mut OpLib) -> Result<(), String> {
-        impl_.builder.new_fn_arg(&self.arg.name()?, &self.arg.edge_type()?.into());
+        let arg_generic = format!("{}_Arg", self.arg.name()?);
+        impl_.generic(&arg_generic);
+        impl_.bound(&arg_generic, "Clone");
+        impl_.bound(&arg_generic, &self.arg.arg_bound()?);
+        impl_.bound(&arg_generic, "'static");
+
+        impl_.builder.new_fn_arg(&self.arg.name()?, &cg::Type::new(&arg_generic));
         impl_.builder.make_self.line(&format!("{},", self.arg.name()?));
-        impl_.builder.struct_.field(&self.arg.name()?, &self.arg.edge_type()?);
+        impl_.builder.struct_.field(&self.arg.name()?, &arg_generic);
 
         let mut setup = cg::Block::new("");
         setup.line(&format!("new_op.add_edge(&self.{})?", &self.arg.name()?));
@@ -107,8 +120,8 @@ impl ConcreteOutputArg {
 impl AddToImpl for ConcreteOutputArg {
     fn add_to_impl(&self, impl_: &mut OpImpl, lib: &mut OpLib) -> Result<(), String> {
         let mut output_block = cg::Block::new("");
-        output_block.line(format!("{}::new(rc.clone(), {})", self.arg.edge_type()?.turbo_fish(), self.port));
-        impl_.add_output(self.arg.edge_type()?.into(), output_block, &self.arg.name()?);
+        output_block.line(format!("{}::new(rc.clone(), {})", self.arg.output_edge_type()?.turbo_fish(), self.port));
+        impl_.add_output(self.arg.output_edge_type()?.into(), output_block, &self.arg.name()?);
         Ok(())
     }
 }
@@ -130,8 +143,8 @@ impl GenericOutputArg {
 impl AddToImpl for GenericOutputArg {
     fn add_to_impl(&self, impl_: &mut OpImpl, lib: &mut OpLib) -> Result<(), String> {
         let mut output_block = cg::Block::new("");
-        output_block.line(format!("{}::new(rc.clone(), {})", self.arg.edge_type()?.turbo_fish(), self.port));
-        impl_.add_output(self.arg.edge_type()?.into(), output_block, &self.arg.name()?);
+        output_block.line(format!("{}::new(rc.clone(), {})", self.arg.output_edge_type()?.turbo_fish(), self.port));
+        impl_.add_output(self.arg.output_edge_type()?.into(), output_block, &self.arg.name()?);
         impl_.generic(&self.arg.type_attr()?);
         impl_.bound(&self.arg.type_attr()?, "TensorType");
         Ok(())
@@ -175,11 +188,30 @@ impl Arg {
         Ok(escape_keyword(&tf_data_type_to_rust(self.arg.get_field_type())?))
     }
 
-    fn edge_type(&self) -> Result<Type, String> {
+    fn type_name(&self) -> Result<String, String> {
         if self.type_attr()? != "" {
-            Ok(wrap_type("Edge", self.type_attr()?).into())
+            self.type_attr()
         } else {
-            Ok(wrap_type("Edge", self.type_()?).into())
+            self.type_()
+        }
+    }
+
+    fn output_edge_type(&self) -> Result<Type, String> {
+        let wrapper: &str;
+        if self.arg.get_is_ref() {
+            wrapper = "RefEdge";
+        } else {
+            wrapper = "Edge";
+        }
+
+        Ok(wrap_type(wrapper, self.type_name()?).into())
+    }
+
+    fn arg_bound(&self) -> Result<String, String> {
+        if self.arg.get_is_ref() {
+            Ok(format!("GraphRefEdge<{}>", self.type_name()?))
+        } else {
+            Ok(format!("GraphEdge<{}>", self.type_name()?))
         }
     }
 }

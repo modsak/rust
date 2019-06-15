@@ -30,6 +30,9 @@ impl OpLib {
         lib.scope.import("super::graph", "GraphOperation");
         lib.scope.import("super::graph", "Operation");
         lib.scope.import("super::graph", "Edge");
+        lib.scope.import("super::graph", "RefEdge");
+        lib.scope.import("super::graph", "GraphEdge");
+        lib.scope.import("super::graph", "GraphRefEdge");
         lib.scope.import("super", "Shape as OtherShape");
         lib.scope.import("super", "new_id");
         lib.scope.import("super", "TensorType");
@@ -209,7 +212,15 @@ impl Builder {
                .line("    Some(name) => name.clone(),")
                .line(format!("    None => graph.new_op_name(\"{}_{{}}\")?", &self.op_name))
                .line("};")
-               .line(format!("let mut new_op = graph.new_operation(\"{}\", &op_name)?;", &self.op_name));
+               .line("let mut control_inputs = Vec::new();")
+               .line("for control_input in self.control_inputs.iter() {")
+               .line("    control_inputs.push(control_input.tf_operation(graph)?);")
+               .line("}")
+               .line(format!("let mut new_op = graph.new_operation(\"{}\", &op_name)?;", &self.op_name))
+               .line("for control_input in control_inputs {")
+               .line("    new_op.add_control_input(&control_input)")
+               .line("}");
+
 
         for block in &self.op_description_setup {
             make_op.push_block(block.clone());
@@ -222,14 +233,14 @@ impl Builder {
     }
 
     /// Implement the GraphOperation trait for adding to a graph
-    fn graph_operation_impl(&self) -> Result<cg::Impl, String> {
-        let mut graph_operation_impl = self.impl_graph_operation.clone();
-        graph_operation_impl.impl_trait("GraphOperation")
-                            .new_fn("get_id")
-                            .arg_ref_self()
-                            .ret("usize")
-                            .line("self.id_");
+    fn graph_operation_impl(&mut self) -> Result<cg::Impl, String> {
+        self.impl_.new_fn("get_id")
+                  .arg_ref_self()
+                  .ret("usize")
+                  .line("self.id_");
 
+        let mut graph_operation_impl = self.impl_graph_operation.clone();
+        graph_operation_impl.impl_trait("GraphOperation");
         graph_operation_impl.push_fn(self.make_op()?);
         Ok(graph_operation_impl)
     }
@@ -278,6 +289,22 @@ impl Builder {
                   .arg("op_name", "&str")
                   .ret("&mut Self")
                   .line("self.op_name = Some(op_name.to_string());")
+                  .line("self");
+    }
+
+    fn add_control_inputs(&mut self) {
+        self.struct_.field("control_inputs", "Vec<Rc<dyn GraphOperation>>");
+        self.make_self.line("control_inputs: Vec::new(),");
+        self.impl_.new_fn("control_input")
+                  .vis("pub")
+                  .arg_mut_self()
+                  .generic("ControlInputT")
+                  .bound("ControlInputT", "GraphOperation")
+                  .bound("ControlInputT", "Clone")
+                  .bound("ControlInputT", "'static")
+                  .arg("control_input", "ControlInputT")
+                  .ret("&mut Self")
+                  .line("self.control_inputs.push(Rc::new(control_input.clone()));")
                   .line("self");
     }
 
@@ -332,6 +359,16 @@ impl Builder {
         self.direct_new_fn.arg(name, ty);
     }
 
+    pub(crate) fn new_fn_generic(&mut self, name: &str) {
+        self.new_fn.generic(name);
+        self.direct_new_fn.generic(name);
+    }
+
+    pub(crate) fn new_fn_bound(&mut self, name: &str, bound: &str) {
+        self.new_fn.bound(name, bound);
+        self.direct_new_fn.bound(name, bound);
+    }
+
     fn setup_direct_new(&mut self) {
         let finish_ret = self.finish_ret();
         let mut make_self = self.make_self.clone();
@@ -346,6 +383,7 @@ impl Builder {
     /// Add all the generated code to the scope
     fn finish(mut self, scope: &mut cg::Scope) -> Result<(), String> {
         self.add_optional_name();
+        self.add_control_inputs();
         scope.push_impl(self.graph_operation_impl()?);
         self.impl_.push_fn(self.make_finish()?);
 
@@ -368,79 +406,6 @@ impl Builder {
     }
 }
 
-// impl Finished {
-//     fn new(name: &str) -> Self {
-//         Self {
-//             name: name.to_string(),
-//             struct_: cg::Struct::new(name),
-//             impl_: cg::Impl::new(name),
-//             outputs: Vec::new(),
-//         }
-//     }
-
-//     fn inner_type(builder: &Builder) -> cg::Type {
-//         wrap_type("Rc", builder.struct_.ty())
-//     }
-
-//     fn edge_type(output: &Function) -> Result<cg::Type, String> {
-//         match output.ret {
-//             Some(ref ret) => Ok(ret.clone()),
-//             None => Err("Output has no return type".to_string()),
-//         }
-//     }
-
-//     fn into_edge_type(output: &Function) -> Result<cg::Type, String> {
-//         Ok(wrap_type("Into", Self::edge_type(output)?))
-//     }
-
-//     /// Implement Into<Edge<T>> for the finished struct
-//     fn add_into_edge(&self, output: Function) -> Result<cg::Impl, String> {
-//         let mut impl_into = cg::Impl::new(&self.name);
-//         impl_into.impl_trait(Self::into_edge_type(&output)?)
-//                  .new_fn("into")
-//                  .ret(Self::edge_type(&output)?)
-//                  .arg_self()
-//                  .line(&format!("self.{}", output.name));
-//         Ok(impl_into)
-//     }
-
-//     pub(crate) fn add_output(&mut self, function: Function) {
-//         self.outputs.push(function);
-//     }
-
-//     fn generic(&mut self, ty: &str) {
-//         self.struct_.generic(ty);
-//         self.impl_.generic(ty);
-//         self.impl_.target_generic(ty);
-//     }
-
-//     fn bound(&mut self, ty: &str, bound: &str) {
-//         self.struct_.bound(ty, bound);
-//         self.impl_.bound(ty, bound);
-//     }
-
-//     fn finish(mut self, scope: &mut cg::Scope, builder: &Builder) -> Result<(), String> {
-//         self.impl_.new_fn("new")
-//                   .ret("Self")
-//                   .vis("pub")
-//                   .arg("inner", Self::inner_type(builder))
-//                   .line("Self{inner}");
-
-//         self.struct_.field("inner", Self::inner_type(builder));
-
-//         if self.outputs.len() == 1 {
-//             self.add_into_edge(self.outputs[0].clone())?;
-//         }
-
-//         for output in self.outputs {
-//             self.impl_.push_fn(output.into());
-//         }
-
-//         scope.push_impl(self.impl_);
-//         scope.push_struct(self.struct_);
-//         Ok(())
-//     }
-// }
 
 impl OpImpl {
     pub(crate) fn new(name: &str) -> Self {
@@ -487,201 +452,3 @@ impl OpImpl {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// pub(crate) struct OpImpl<'a> {
-//     lifetime_params: AsciiIter,
-//     op_struct: cg::Struct,
-//     op_impl: cg::Impl,
-//     op_trait_impl: cg::Impl,
-//     new: cg::Function,
-//     make_self: cg::Block,
-//     tf_operation: cg::Function,
-//     op_wrapper_struct: cg::Struct,
-//     inner_field: String,
-//     finished_type: String,
-//     op_wrapper_impl: cg::Impl,
-//     op_wrapper_new: cg::Function,
-//     impl_into_edge: cg::Impl,
-//     num_outputs: usize,
-//     lib: &'a mut OpLib,
-//     phantom_i: usize,
-//     generic_i: usize,
-// }
-
-// impl<'a> OpImpl<'a> {
-//     fn new(op: &Op, lib: &'a mut OpLib) -> Self {
-//         let mut s = Self {
-//             lifetime_params: AsciiIter::new(),
-//             op_struct: cg::Struct::new(&op.builder_name()),
-//             op_impl: cg::Impl::new(op.builder_name()),
-//             op_trait_impl: cg::Impl::new(op.builder_name()),
-//             new: cg::Function::new("new"),
-//             make_self: cg::Block::new("Self"),
-//             tf_operation: cg::Function::new("tf_operation"),
-//             op_wrapper_struct: cg::Struct::new(&op.finised_name()),
-//             inner_field: format!("Rc<{}<", op.builder_name()),
-//             finished_type: format!("{}<", op.finised_name()),
-//             op_wrapper_impl: cg::Impl::new(&op.finised_name()),
-//             op_wrapper_new: cg::Function::new("new"),
-//             impl_into_edge: cg::Impl::new(&op.finised_name()),
-//             num_outputs: 0,
-//             lib,
-//             phantom_i: 0,
-//             generic_i: 0,
-//         };
-
-//         s.op_struct.field("id_", "usize").vis("pub");
-//         s.op_trait_impl.impl_trait("GraphOperation")
-//                        .new_fn("get_id")
-//                        .arg_ref_self()
-//                        .ret("usize")
-//                        .line("self.id_");
-
-//         s.new.ret("Self").vis("pub");
-
-//         s.make_self.line("id_: new_id(),");
-
-//         s.default_field("op_name", Type::new("String".to_string()).option(), "None");
-
-//         s.tf_operation.arg_ref_self()
-//                       .arg("graph", format!("&mut Graph"))
-//                       .ret(format!("Result<Operation>"))
-//                       .line("if let Some(x) = graph.get_op_by_id(self.get_id()) {")
-//                       .line("    return Ok(x);")
-//                       .line("}")
-//                       .line("let op_name = match &self.op_name {")
-//                       .line("    Some(name) => name.clone(),")
-//                       .line(format!("    None => graph.new_op_name(\"{}_{{}}\")?", op.name()))
-//                       .line("};")
-//                       .line(format!("let mut new_op = graph.new_operation(\"{}\", &op_name)?;", op.name()));
-
-//         s.op_wrapper_new.ret("Self");
-//         s.op_wrapper_struct.vis("pub");
-
-//         s.op_impl.new_fn("finish")
-//                  .vis("pub")
-//                  .arg_self()
-//                  .ret(&format!("{}>", s.finished_type))
-//                  .line(&format!("{}::new(Rc::new(self))", op.finised_name()));
-//         s
-//     }
-
-//     fn new_generic(&mut self) -> String {
-//         self.generic_i += 1;
-//         format!("__T{}", self.generic_i)
-//     }
-
-//     fn generic(&mut self, ty: &str) {
-//         self.op_struct.generic(ty);
-//         self.op_impl.generic(ty);
-//         self.op_impl.target_generic(ty);
-//         self.op_trait_impl.generic(ty);
-//         self.op_trait_impl.target_generic(ty);
-
-//         self.op_wrapper_struct.generic(ty);
-//         self.op_wrapper_impl.generic(ty);
-//         self.op_wrapper_impl.target_generic(ty);
-//         self.impl_into_edge.generic(ty);
-//         self.impl_into_edge.target_generic(ty);
-
-//         self.inner_field.push_str(&format!("{}, ", ty));
-//         self.finished_type.push_str(&format!("{}, ", ty));
-
-//         self.op_struct.field(&format!("phantom_{}", self.phantom_i), &format!("PhantomData<{}>", ty));
-//         self.make_self.line(&format!("phantom_{}: PhantomData,", self.phantom_i));
-//         self.phantom_i += 1;
-//     }
-
-//     fn generic_with_bound(&mut self, ty: &str, bound: &str) {
-//         self.generic(ty);
-//         self.bound(ty, bound);
-//     }
-
-//     fn bound(&mut self, name: &str, bound: &str) {
-//         self.op_struct.bound(name, bound);
-//         self.op_impl.bound(name, bound);
-//         self.op_trait_impl.bound(name, bound);
-//         self.op_wrapper_struct.bound(name, bound);
-//         self.op_wrapper_impl.bound(name, bound);
-//         self.impl_into_edge.bound(name, bound);
-//     }
-
-//     fn field<T: Into<cg::Type>>(&mut self, name: &str, ty: T) {
-//         let ty_ref: &cg::Type = &ty.into();
-//         self.new.arg(name, ty_ref);
-//         self.op_struct.field(name, ty_ref);
-//         self.make_self.line(format!("{},", name));
-
-//     }
-
-//     fn default_field(&mut self, name: &str, ty: Type, default: &str) {
-//         self.op_struct.field(name, &ty);
-//         self.make_self.line(format!("{}: {},", name, default));
-//         self.op_impl.new_fn(name).arg_mut_self()
-//                                  .ret("&mut Self")
-//                                  .arg(name, &ty)
-//                                  .line(format!("self.{} = {};", name, name))
-//                                  .line("self")
-//                                  .vis("pub");
-//     }
-
-//     // fn output(&mut self, port: usize, arg: &Arg) -> Result<(), String> {
-//     //     self.op_wrapper_impl.new_fn(&arg.name()?)
-//     //                         .arg_ref_self()
-//     //                         .ret(arg.type_name()?)
-//     //                         .line(&arg.constructor(port)?)
-//     //                         .vis("pub");
-//     //     self.num_outputs += 1;
-//     //     if self.num_outputs == 1 {
-//     //         self.impl_into_edge.impl_trait(format!("Into<{}>", arg.type_name()?))
-//     //                            .new_fn("into")
-//     //                            .arg_self()
-//     //                            .ret(arg.type_name()?)
-//     //                            .line(format!("{}::new(self.inner.clone(), 0)", arg.type_name()?.turbo_fish()));
-//     //     }
-
-//     //     Ok(())
-//     // }
-
-//     fn trait_field(&mut self, name: &str, trait_: &str) {
-//         let arg_generic = self.new_generic();
-//         self.new.arg(name, &arg_generic);
-//         self.op_struct.field(name, &format!("Box<dyn {}>", trait_));
-//         self.make_self.line(format!("{}: Box::new({}),", name, name));
-//         self.generic_with_bound(&arg_generic, &format!("{} + 'static", trait_));
-//     }
-
-//     fn deault_trait_field(&mut self, name: &str, trait_: &str, default: &str) {
-//         let arg_generic = self.new_generic();
-//         self.op_struct.field(name, &format!("Box<dyn {}>", trait_));
-//         self.make_self.line(format!("{}: {},", name, default));
-
-//         self.op_impl.new_fn(name).arg_mut_self()
-//                                  .ret("&mut Self")
-//                                  .arg(name, &arg_generic)
-//                                  .line(format!("self.{} = {};", name, name))
-//                                  .line("self")
-//                                  .vis("pub")
-//                                  .generic(&arg_generic)
-//                                  .bound(&arg_generic, &format!("{} + 'static", trait_));
-//     }
-// }

@@ -55,8 +55,8 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     // Run the graph.
     let mut args = SessionRunArgs::new();
-    args.add_feed(&graph.operation_by_name_required("x")?, 0, &x);
-    args.add_feed(&graph.operation_by_name_required("y")?, 0, &y);
+    args.add_feed(&graph.operation_by_name_required("x")?, 0, x);
+    args.add_feed(&graph.operation_by_name_required("y")?, 0, y);
     let z = args.request_fetch(&graph.operation_by_name_required("z")?, 0);
     session.run(&mut args)?;
 

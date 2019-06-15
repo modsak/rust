@@ -40,6 +40,7 @@ use std::str::Utf8Error;
 use std::sync::Mutex;
 use std::rc::Rc;
 
+
 use tensorflow_sys as tf;
 
 #[macro_use]
@@ -193,6 +194,12 @@ pub mod expr;
 pub mod io;
 
 pub mod ops;
+
+pub mod sugar;
+pub use crate::sugar::*;
+
+pub mod train;
+pub use crate::train::*;
 
 ////////////////////////
 
@@ -1149,9 +1156,22 @@ impl<T: TensorType> Tensor<T> {
     }
 
     /// Creates a new tensor with the values given
-    pub fn from_values(values: &[T]) -> Result<Self> {
-        let mut new_tensor = Self::new(&[values.len() as u64]);
-        new_tensor.with_values(values)
+    pub fn from_values<I: IntoIterator<Item=T>>(shape: &[u64], values: I) -> Result<Self> {
+        let mut new_tensor = Self::new(shape);
+
+        let mut l: usize = 0;
+        for (e, v) in new_tensor.iter_mut().zip(values) {
+            l += 1;
+            *e = v;
+        }
+
+        if l != new_tensor.len() {
+            return Err(invalid_arg!("Not enough values, expected {} got {}",
+                                    new_tensor.len(),
+                                    l));
+        }
+
+        Ok(new_tensor)
     }
 
     /// Sets (copies) the tensor values to the provided ones.
@@ -1509,7 +1529,7 @@ mod tests {
         x[1] = 3.0;
         let mut step = SessionRunArgs::new();
         let x_op = graph.operation_by_name_required("x").unwrap();
-        step.add_feed(&x_op, 0, &x);
+        step.add_feed(&x_op, 0, x);
         let y_op = graph.operation_by_name_required("y").unwrap();
         let output_ix = step.request_fetch(&y_op, 0);
         session.run(&mut step).unwrap();
@@ -1560,7 +1580,7 @@ mod tests {
         x[0] = "foo".to_string();
         x[1] = "bar".to_string();
         let mut step = SessionRunArgs::new();
-        step.add_feed(&x_op, 0, &x);
+        step.add_feed(&x_op, 0, x);
         let output_ix = step.request_fetch(&y_op, 0);
         session.run(&mut step).unwrap();
         let output_tensor = step.fetch::<String>(output_ix).unwrap();

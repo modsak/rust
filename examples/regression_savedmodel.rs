@@ -66,8 +66,8 @@ fn run() -> Result<(), Box<dyn Error>> {
 
     // Train the model (e.g. for fine tuning).
     let mut train_step = SessionRunArgs::new();
-    train_step.add_feed(&op_x, 0, &x);
-    train_step.add_feed(&op_y, 0, &y);
+    train_step.add_feed(&op_x, 0, x);
+    train_step.add_feed(&op_y, 0, y);
     train_step.add_target(&op_train);
     for _ in 0..steps {
         session.run(&mut train_step)?;

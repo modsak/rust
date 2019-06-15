@@ -87,7 +87,7 @@ fn run() -> Result<(), Box<Error>> {
     x[0] = 2.0;
     x[1] = 3.0;
     let mut step = SessionRunArgs::new();
-    step.add_feed(&x_node, 0, &x);
+    step.add_feed(&x_node, 0, x);
     let output_token = step.request_fetch(&y_node, 0);
     session.run(&mut step).unwrap();
 
